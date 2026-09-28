@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "paths": {
+    "data_root": "~/MeetLocalAI",
+    "meetings_dir": "~/MeetLocalAI/Meetings",
+    "models_dir": "~/MeetLocalAI/Models",
+    "logs_dir": "~/MeetLocalAI/Logs",
+    "exports_dir": "~/MeetLocalAI/Exports",
+    "temp_dir": "~/MeetLocalAI/Temp"
+  },
+  "backend": {
+    "host": "127.0.0.1",
+    "port": 8765,
+    "allowed_extension_ids": []
+  },
+  "audio": {
+    "capture_tab": true,
+    "capture_mic": true,
+    "chunk_seconds": 5,
+    "wav_sample_rate": 16000,
+    "wav_channels": 1,
+    "keep_raw_tracks": true
+  },
+  "transcription": {
+    "engine": "auto",
+    "model": "auto",
+    "language": "it",
+    "detect_language": false,
+    "timestamps": true,
+    "diarization": "channels"
+  },
+  "llm": {
+    "provider": "ollama",
+    "base_url": "http://127.0.0.1:11434",
+    "model": "",
+    "temperature": 0.2,
+    "context_tokens": 8192,
+    "summary_language": "it"
+  },
+  "summary": {
+    "enabled": true,
+    "max_tldr_points": 10,
+    "sections": [
+      "TL;DR",
+      "DECISIONI",
+      "ACTION ITEMS",
+      "PROBLEMI / CRITICITÀ",
+      "INFORMAZIONI IMPORTANTI",
+      "DOMANDE APERTE",
+      "PROSSIMI PASSI"
+    ],
+    "not_determinable_text": "Non chiaramente determinabile dalla trascrizione."
+  },
+  "logging": {
+    "level": "INFO",
+    "max_bytes": 5242880,
+    "backup_count": 5,
+    "log_transcript_content": false
+  }
+}

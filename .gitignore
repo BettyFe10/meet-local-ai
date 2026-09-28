@@ -1,0 +1,38 @@
+# --- Dati utente: MAI nel repository ---
+*.wav
+*.webm
+*.ogg
+*.mp3
+*.m4a
+Meetings/
+Exports/
+Temp/
+Logs/
+*.log
+# Configurazione locale (il repo contiene solo config.example.json)
+config/config.json
+# Modelli (Whisper, LLM)
+Models/
+*.bin
+*.gguf
+*.safetensors
+*.mlmodelc/
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# Node / build
+node_modules/
+dist/
+build/
+# macOS
+.DS_Store
+# Segreti (non previsti, ma per sicurezza)
+.env
+*.pem
+*.key
+# Report diagnostici della macchina (contengono nomi dispositivi, utente, porte)
+env_report*.txt
+diagnose_report*.txt

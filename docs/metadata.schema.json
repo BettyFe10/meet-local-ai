@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "meetlocalai/metadata.schema.json",
+  "title": "Meet Local AI — metadata.json di una riunione",
+  "type": "object",
+  "required": ["schema_version", "id", "title", "created_at", "date", "start_time", "duration_seconds", "status", "language", "whisper", "llm", "files", "app_version"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}_[A-Za-z0-9_-]{1,80}$", "description": "Uguale al nome della cartella" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "ended_at": { "type": ["string", "null"], "format": "date-time" },
+    "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "start_time": { "type": "string", "pattern": "^[0-9]{2}:[0-9]{2}$" },
+    "duration_seconds": { "type": ["number", "null"], "minimum": 0 },
+    "status": { "enum": ["recording", "stopped", "converting", "transcribing", "summarizing", "completed", "error", "interrupted"] },
+    "error": {
+      "type": ["object", "null"],
+      "properties": {
+        "step": { "type": "string" },
+        "user_message": { "type": "string" },
+        "at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "language": { "type": "string", "description": "Lingua configurata (es. it)" },
+    "detected_language": { "type": ["string", "null"] },
+    "source": {
+      "type": "object",
+      "properties": { "meet_code": { "type": ["string", "null"] } }
+    },
+    "audio": {
+      "type": "object",
+      "properties": {
+        "tracks": { "type": "array", "items": { "enum": ["tab", "mic"] } },
+        "sample_rate": { "type": "integer" },
+        "channels": { "type": "integer" },
+        "size_bytes": { "type": ["integer", "null"] }
+      }
+    },
+    "whisper": {
+      "type": "object",
+      "required": ["engine", "model"],
+      "properties": { "engine": { "type": ["string", "null"] }, "model": { "type": ["string", "null"] } }
+    },
+    "llm": {
+      "type": "object",
+      "required": ["provider", "model"],
+      "properties": { "provider": { "type": ["string", "null"] }, "model": { "type": ["string", "null"] } }
+    },
+    "files": {
+      "type": "object",
+      "required": ["folder"],
+      "properties": {
+        "folder": { "type": "string", "description": "Percorso assoluto al momento della scrittura (informativo: il backend lo ricalcola)" },
+        "audio": { "type": ["string", "null"] },
+        "transcript_txt": { "type": ["string", "null"] },
+        "transcript_md": { "type": ["string", "null"] },
+        "summary_md": { "type": ["string", "null"] }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "recording_seconds": { "type": ["number", "null"] },
+        "conversion_seconds": { "type": ["number", "null"] },
+        "transcription_seconds": { "type": ["number", "null"] },
+        "realtime_factor": { "type": ["number", "null"], "description": "tempo trascrizione / durata audio" },
+        "summary_seconds": { "type": ["number", "null"] },
+        "peak_rss_mb": { "type": ["number", "null"] },
+        "disk_bytes": { "type": ["integer", "null"] }
+      }
+    },
+    "app_version": { "type": "string" }
+  }
+}

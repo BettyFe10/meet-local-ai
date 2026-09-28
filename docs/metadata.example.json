@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "2026-09-27_10-30_Riunione-commerciale",
+  "title": "Riunione commerciale",
+  "created_at": "2026-09-27T10:30:04+02:00",
+  "updated_at": "2026-09-27T11:26:40+02:00",
+  "ended_at": "2026-09-27T11:17:12+02:00",
+  "date": "2026-09-27",
+  "start_time": "10:30",
+  "duration_seconds": 2828,
+  "status": "completed",
+  "error": null,
+  "language": "it",
+  "detected_language": "it",
+  "source": { "meet_code": "abc-defg-hij" },
+  "audio": { "tracks": ["tab", "mic"], "sample_rate": 16000, "channels": 1, "size_bytes": 90496044 },
+  "whisper": { "engine": "ESEMPIO", "model": "ESEMPIO" },
+  "llm": { "provider": "ollama", "model": "ESEMPIO" },
+  "files": {
+    "folder": "/Users/utente/MeetLocalAI/Meetings/2026-09-27_10-30_Riunione-commerciale",
+    "audio": "audio.wav",
+    "transcript_txt": "transcript.txt",
+    "transcript_md": "transcript.md",
+    "summary_md": "summary.md"
+  },
+  "performance": {
+    "recording_seconds": 2828,
+    "conversion_seconds": 6.1,
+    "transcription_seconds": 480.0,
+    "realtime_factor": 0.17,
+    "summary_seconds": 35.0,
+    "peak_rss_mb": null,
+    "disk_bytes": 104857600
+  },
+  "app_version": "0.1.0"
+}
