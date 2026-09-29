@@ -45,6 +45,25 @@ Meetings/2026-09-27_10-30_Riunione-commerciale/
 - Titolo sanitizzato: lettere/numeri/`-`/`_`, max 60 caratteri, accenti rimossi; collisione → suffisso `_2`, `_3`.
 - Rinominare il titolo cambia solo `metadata.title`, non la cartella.
 
+## 2b. Backend — struttura del codice (Fase 3)
+```
+backend/
+  requirements.txt / requirements-dev.txt   versioni esatte
+  meetlocalai/
+    __init__.py       versione app
+    __main__.py       avvio uvicorn (host forzato 127.0.0.1) + CLI --print-port/--print-dir/--check-config
+    app.py            create_app(): FastAPI, handler errori, route /api/v1/*
+    config.py         load(): esempio + config locale (deep merge), validate(), data_dirs()
+    paths.py          REPO_ROOT ricavato dal file; MEETLOCALAI_CONFIG sovrascrive il percorso config
+    security.py       middleware Host / Origin / X-MeetLocalAI / CORS
+    health.py         controlli FFmpeg e Ollama (solo stdlib)
+    logging_setup.py  RotatingFileHandler in <logs_dir>/backend.log
+    messages.py       testi fissi per l'utente
+  .venv/              (non versionato) creato da installer/setup_backend.sh
+tests/backend/        pytest (pytest.ini alla radice del repo)
+```
+PID del backend: `<temp_dir>/backend.pid`; output di processo: `<logs_dir>/backend.stdout.log`.
+
 ## 3. Chrome Extension (MV3)
 | File | Ruolo |
 |---|---|

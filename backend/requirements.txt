@@ -1,0 +1,5 @@
+# Dipendenze runtime del backend (versioni testate; aggiornare solo dopo aver rieseguito i test)
+fastapi==0.141.1
+starlette==1.7.0
+pydantic==2.13.5
+uvicorn==0.54.0

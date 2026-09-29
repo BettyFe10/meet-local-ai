@@ -28,17 +28,24 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] Decidere la licenza prima di un'eventuale apertura (D-020)
 - [ ] Fase 13: controllo automatico "nessun dato personale nei file tracciati" nei test
 
-## FASE 3 — Backend minimo (PROSSIMA)
-- [ ] (U) Eseguire script di setup Python (venv con python3.12 o 3.13)
-- [ ] FastAPI su 127.0.0.1:8765 con /api/v1/health e /api/v1/status
-- [ ] Caricamento config con merge sui default + validazione (host loopback, llm.base_url loopback)
-- [ ] Middleware sicurezza: Host check, CORS estensione, header X-MeetLocalAI
-- [ ] Test pytest backend
-- [ ] Logging rotante in ~/MeetLocalAI/Logs
-- [ ] start_backend.sh / stop_backend.sh
+## FASE 3 — Backend minimo ✅
+- [x] (U) Eseguire script di setup Python (venv con python3.12 o 3.13)
+- [x] FastAPI su 127.0.0.1:8765 con /api/v1/health e /api/v1/status
+- [x] Caricamento config con merge sui default + validazione (host loopback, llm.base_url loopback)
+- [x] Middleware sicurezza: Host check, CORS estensione, header X-MeetLocalAI
+- [x] Test pytest backend
+- [x] Logging rotante in ~/MeetLocalAI/Logs
+- [x] start_backend.sh / stop_backend.sh
 
-## FASE 4–16
-- [ ] Vedi ordine fasi nel brief (Extension minima → Comunicazione → Audio → Whisper → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
+## FASE 4 — Chrome Extension minima (PROSSIMA)
+- [ ] manifest.json MV3 con key fissa, permessi minimi
+- [ ] popup (PRONTO / Backend offline), dashboard, meeting, settings (vuoti ma navigabili)
+- [ ] service worker con macchina a stati
+- [ ] ID estensione in backend.allowed_extension_ids
+- [ ] (U) Caricare l'estensione in Chrome
+
+## FASE 5–16
+- [ ] Vedi ordine fasi nel brief (Comunicazione → Audio → Whisper → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
 
 ## Installazioni previste (NON ancora eseguite)
 - [ ] (U) `brew install ffmpeg` — Fase 6/7
@@ -46,3 +53,7 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] Motore Whisper (scelta dopo benchmark) — Fase 7
 - [ ] Modello Whisper scelto — Fase 7
 - [ ] Modello LLM scelto — Fase 9
+
+## Debito tecnico / note
+- [ ] Starlette segnala che `httpx` per TestClient è deprecato (suggerisce `httpx2`): solo test, nessun impatto runtime. Rivalutare quando si aggiornano le dipendenze.
+- [ ] Avvio automatico del backend al login (launchd) — valutare in Fase 14.

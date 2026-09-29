@@ -27,5 +27,21 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Push su GitHub | NON TESTATA | Da eseguire dall'utente |
 | Backend / Extension / Audio / Whisper / LLM | NON TESTATA | Non ancora implementati |
 
+## Fase 3 — 2026-09-28/29
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite pytest `tests/backend` (31 test: config, API, sicurezza, CLI) | VM Linux, Python 3.10 | SUPERATO | |
+| Suite pytest `tests/backend` (31 test) | **Mac M4, Python 3.12.6** | SUPERATO | eseguita da setup_backend.sh |
+| setup_backend.sh prima esecuzione + riesecuzione (idempotenza) | VM Linux | SUPERATO | |
+| setup_backend.sh prima esecuzione | Mac | SUPERATO | venv creato, dipendenze installate |
+| start_backend.sh / avvio doppio ("già attivo") / stop / stop doppio | VM Linux | SUPERATO | |
+| start_backend.sh → health risponde | Mac | SUPERATO | |
+| Richiesta senza header X-MeetLocalAI → 403 | Mac | SUPERATO | |
+| Backend in ascolto SOLO su 127.0.0.1:8765 | Mac (lsof) | SUPERATO | |
+| stop_backend.sh | Mac | SUPERATO | |
+| health: FFmpeg / Whisper / LLM segnalati non disponibili con messaggio utente | Mac | SUPERATO | corretto: non ancora installati |
+| Porta 8765 occupata da altro programma → messaggio chiaro | — | NON TESTATA | logica presente in start_backend.sh |
+| Chrome Extension | — | NON TESTATA | Fase 4 |
+
 ## Benchmark
 Nessun benchmark ancora eseguito (previsto in Fase 7 per Whisper e Fase 9 per LLM).

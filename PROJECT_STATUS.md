@@ -1,23 +1,28 @@
 # PROJECT_STATUS — Meet Local AI
 
-**Ultimo aggiornamento:** 2026-09-28
-**Fase corrente:** FASE 2 — Architettura e struttura progetto → ✅ COMPLETATA
-**Prossima fase:** FASE 3 — Backend minimo (NON ANCORA INIZIATA)
+**Ultimo aggiornamento:** 2026-09-29
+**Fase corrente:** FASE 3 — Backend minimo → ✅ COMPLETATA (verificata sul Mac)
+**Prossima fase:** FASE 4 — Chrome Extension minima (NON ANCORA INIZIATA)
 
-## Fase 2 — cosa è stato fatto
-- Struttura repo: `extension/ backend/ installer/ docs/ tests/ config/` + `.gitignore` (esclude audio, modelli, config locale, venv).
-- Cartelle dati create: `~/MeetLocalAI/{Meetings,Models,Logs,Config,Exports,Temp}`.
-- `config/config.example.json` (repo) e `~/MeetLocalAI/Config/config.json` (locale, copia dell'esempio). Nessun segreto.
-- `docs/metadata.schema.json` (JSON Schema) + `docs/metadata.example.json` (valido contro lo schema).
-- ARCHITECTURE.md: layout disco, componenti estensione, contratto API `/api/v1`, pipeline e stati, sicurezza.
-- DECISIONS.md: confermate D-001, D-007; aggiunte D-010…D-016.
-- Repository git locale inizializzato; preparato per GitHub privato (README.md, docs/GITHUB.md, .gitattributes, esclusione report macchina, cronologia ripulita).
+## Fase 3 — cosa è stato fatto
+- `backend/meetlocalai/`: config (default da esempio + override locale, validazione host/porta/LLM loopback), log rotanti in `Logs/backend.log`, sicurezza (Host, Origin estensione, header `X-MeetLocalAI`), messaggi utente fissi, API `/api/v1/health` e `/api/v1/status`, CLI `python -m meetlocalai [--print-port|--print-dir|--check-config]`.
+- Nessuna UI web esposta (docs/openapi disabilitati).
+- Script: `installer/setup_backend.sh` (idempotente: venv + dipendenze + cartelle + test), `start_backend.sh`, `stop_backend.sh`.
+- 31 test pytest in `tests/backend/`.
+- Sul Mac: venv creato con Python 3.12.6 in `backend/.venv`; test superati; backend avviato, risponde, ascolta solo su 127.0.0.1:8765, fermato correttamente.
 
-## Prossima attività (FASE 3 — Backend minimo)
-1. Creare `backend/` FastAPI con `/api/v1/health` e `/api/v1/status`, caricamento config (merge con default), log rotanti, sicurezza Host/Origin.
-2. Creare `start_backend.sh` / `stop_backend.sh` e uno script di setup del venv.
-3. **(U) L'utente dovrà eseguire una volta lo script di setup** (crea `backend/.venv` e installa FastAPI/uvicorn: richiede Internet solo per pip).
-4. Test pytest del backend (eseguibili anche nella VM di Claude).
+## Come si usa ora
+```bash
+cd ~/MeetLocalAI/app && ./start_backend.sh     # avvia
+./stop_backend.sh                              # ferma
+./installer/setup_backend.sh                   # (ri)prepara l'ambiente, rilanciabile
+```
+
+## Prossima attività (FASE 4 — Chrome Extension minima)
+1. `extension/manifest.json` MV3 con `key` fissa (ID stabile), permessi `tabCapture`, `offscreen`, `storage`, host Meet + 127.0.0.1:8765.
+2. popup/dashboard/meeting/settings minimi (HTML/CSS/JS vanilla), service worker, stato PRONTO/Backend offline.
+3. Aggiungere l'ID estensione a `backend.allowed_extension_ids` (fine della modalità sviluppo).
+4. **(U)** Caricare l'estensione in Chrome (`chrome://extensions` → Modalità sviluppatore → Carica non pacchettizzata → `extension/`).
 
 ## Percorsi
 - Root progetto (repository codice): `~/MeetLocalAI/app/`
@@ -68,10 +73,9 @@
 4. Le mie azioni sul Mac passano da una VM che vede solo `~/MeetLocalAI`: installazioni di sistema (brew, Ollama) e il caricamento dell'estensione in Chrome richiederanno che l'utente esegua comandi/script forniti.
 
 ## Operazioni che richiedono intervento dell'utente
-- Nessuna per chiudere la Fase 2.
 - (Opzionale, quando vuoi) Pubblicare su GitHub privato seguendo `docs/GITHUB.md` (creare repo + `git push`).
-- In Fase 3: eseguire lo script di setup del backend (un comando nel Terminale).
+- In Fase 4: caricare l'estensione in Chrome (istruzioni fornite).
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 3.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 4.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).
