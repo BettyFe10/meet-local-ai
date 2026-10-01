@@ -14,7 +14,7 @@ if ! kill -0 "$PID" 2>/dev/null; then echo "Backend non attivo (PID file obsolet
 if ! ps -p "$PID" -o command= | grep -q "meetlocalai"; then
   echo "[AVVISO] Il PID $PID non appartiene a Meet Local AI: non lo termino. PID file rimosso."; rm -f "$PIDFILE"; exit 1
 fi
-kill "$PID"
+kill "$PID"   # uscita pulita: con l'avvio automatico launchd NON lo riavvia fino al prossimo login o a start_backend.sh
 for _ in $(seq 1 20); do kill -0 "$PID" 2>/dev/null || break; sleep 0.25; done
 kill -0 "$PID" 2>/dev/null && kill -9 "$PID" 2>/dev/null || true
 rm -f "$PIDFILE"

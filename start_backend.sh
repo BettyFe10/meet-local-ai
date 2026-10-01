@@ -13,6 +13,20 @@ LOGS_DIR="$("$VENV_PY" -m meetlocalai --print-dir logs_dir)"
 mkdir -p "$TEMP_DIR" "$LOGS_DIR"
 PIDFILE="$TEMP_DIR/backend.pid"
 
+LABEL="local.meetlocalai.backend"
+if [ "$(uname -s)" = "Darwin" ] && launchctl print "gui/$(id -u)/$LABEL" >/dev/null 2>&1; then
+  # avvio automatico installato: si avvia tramite launchd (stessa gestione dei crash)
+  if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+    echo "Backend già attivo (PID $(cat "$PIDFILE"), avvio automatico) su http://127.0.0.1:$PORT"; exit 0
+  fi
+  launchctl kickstart "gui/$(id -u)/$LABEL"
+  for _ in $(seq 1 30); do
+    curl -s -m 1 -H 'X-MeetLocalAI: 1' "http://127.0.0.1:$PORT/api/v1/health" >/dev/null 2>&1 && { echo "Backend attivo (avvio automatico) su http://127.0.0.1:$PORT"; exit 0; }
+    sleep 0.5
+  done
+  echo "[ERRORE] Il backend non risponde. Vedi $LOGS_DIR/backend.stdout.log"; exit 1
+fi
+
 if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
   echo "Backend già attivo (PID $(cat "$PIDFILE")) su http://127.0.0.1:$PORT"; exit 0
 fi

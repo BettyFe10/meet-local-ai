@@ -64,7 +64,9 @@ backend/
   .venv/              (non versionato) creato da installer/setup_backend.sh
 tests/backend/        pytest (pytest.ini alla radice del repo)
 ```
-PID del backend: `<temp_dir>/backend.pid`; output di processo: `<logs_dir>/backend.stdout.log`.
+PID del backend: `<temp_dir>/backend.pid` (scritto dal backend stesso); output di processo: `<logs_dir>/backend.stdout.log`.
+
+**Avvio automatico:** LaunchAgent utente `~/Library/LaunchAgents/local.meetlocalai.backend.plist` (generato da `installer/launchagent.sh`): RunAtLoad, riavvio solo dopo crash, ProcessType Standard. Il progetto non deve stare in Desktop/Documenti/Download/iCloud (cartelle protette da macOS).
 
 ## 3. Chrome Extension (MV3)
 | File | Ruolo |

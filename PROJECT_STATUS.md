@@ -1,8 +1,23 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-01
-**Fase corrente:** FASE 5 — Comunicazione Extension → Backend → ✅ COMPLETATA (provata in Chrome sul Mac)
-**Prossima attività:** Avvio automatico del backend al login (LaunchAgent, D-024), poi FASE 6 — Cattura audio
+**Fase corrente:** FASE 5 ✅ + Avvio automatico backend ✅ (installato e verificato sul Mac)
+**Prossima fase:** FASE 6 — Cattura audio (NON ANCORA INIZIATA)
+
+## Avvio automatico (LaunchAgent) — cosa è stato fatto
+- `installer/launchagent.sh install|uninstall|status|print-plist` → `~/Library/LaunchAgents/local.meetlocalai.backend.plist` (label `local.meetlocalai.backend`).
+- Parte al login (RunAtLoad), riparte dopo un crash (KeepAlive SuccessfulExit=false, ThrottleInterval 30 s), resta fermo dopo `stop_backend.sh`. ProcessType Standard (la trascrizione non verrà rallentata).
+- Il backend scrive da sé `Temp/backend.pid` → `start_backend.sh` / `stop_backend.sh` funzionano con o senza LaunchAgent (con LaunchAgent: `launchctl kickstart`).
+- Verificato sul Mac: installazione, crash simulato (kill -9) → riavvio automatico (runs=2, nuovo PID), stop manuale → resta spento, start → riparte.
+- Rimozione: `~/MeetLocalAI/app/installer/launchagent.sh uninstall`.
+
+## Come si usa ora
+Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili (facoltativi):
+```bash
+~/MeetLocalAI/app/installer/launchagent.sh status   # stato
+~/MeetLocalAI/app/stop_backend.sh                   # ferma fino al prossimo login
+~/MeetLocalAI/app/start_backend.sh                  # riavvia
+```
 
 ## Fase 5 — cosa è stato fatto
 - Backend `recording.py`: `POST /meetings` (cartella `YYYY-MM-DD_HH-MM_Titolo` + `raw/` + metadata `recording`), `POST /meetings/{id}/chunks?track=&seq=` (append ordinato, duplicati ignorati, buchi → 409 con `next_seq`, max 10 MB, fsync), `POST /meetings/{id}/stop` (durata, `stopped`, idempotente), `PATCH /meetings/{id}` (titolo), `GET /status` con registrazione attiva. Una registrazione alla volta; controllo spazio disco (≥1 GB); scrittura metadata atomica; al riavvio `recording` → `interrupted` con ripresa possibile.
@@ -28,12 +43,6 @@
 - 31 test pytest in `tests/backend/`.
 - Sul Mac: venv creato con Python 3.12.6 in `backend/.venv`; test superati; backend avviato, risponde, ascolta solo su 127.0.0.1:8765, fermato correttamente.
 
-## Come si usa ora
-```bash
-cd ~/MeetLocalAI/app && ./start_backend.sh     # avvia
-./stop_backend.sh                              # ferma
-./installer/setup_backend.sh                   # (ri)prepara l'ambiente, rilanciabile
-```
 
 ## Prossima attività (FASE 4 — Chrome Extension minima)
 1. `extension/manifest.json` MV3 con `key` fissa (ID stabile), permessi `tabCapture`, `offscreen`, `storage`, host Meet + 127.0.0.1:8765.
@@ -94,5 +103,5 @@ cd ~/MeetLocalAI/app && ./start_backend.sh     # avvia
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → fare l'avvio automatico (LaunchAgent), poi FASE 6.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 6.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).

@@ -71,5 +71,17 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Backend offline durante la registrazione (coda) in Chrome reale | — | NON TESTATA | coperto solo da test unitari |
 | Durate < 1 min mostrate come "0 min" | — | CORRETTO | ora "10 s" (ui.test.mjs) |
 
+## Avvio automatico (LaunchAgent) — 2026-10-01
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Plist generato valido (chiavi, percorsi con spazi, ProcessType ≠ Background) | VM Linux | SUPERATO | test_launchagent.py |
+| install: plist creato, `plutil -lint` ok, backend risponde | Mac | SUPERATO | state=running, runs=1 |
+| Crash simulato (kill -9) → riavvio automatico | Mac | SUPERATO | runs=2, PID 58344 → 58432 (entro 35 s) |
+| stop_backend.sh con LaunchAgent → resta spento | Mac | SUPERATO | health non risponde |
+| start_backend.sh con LaunchAgent (kickstart) | Mac | SUPERATO | "Backend attivo (avvio automatico)" |
+| Avvio al login / dopo riavvio del Mac | — | NON TESTATA | da verificare al prossimo riavvio |
+| uninstall | — | NON TESTATA | |
+| Suite completa | VM Linux | SUPERATO | 68 test |
+
 ## Benchmark
 Nessun benchmark ancora eseguito (previsto in Fase 7 per Whisper e Fase 9 per LLM).

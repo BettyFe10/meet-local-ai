@@ -2,9 +2,27 @@
 
 from __future__ import annotations
 
+import atexit
+import os
 import sys
 
 from . import config as config_mod
+
+
+def _write_pidfile(path) -> None:
+    """PID file scritto dal backend stesso: funziona sia con start_backend.sh sia con il LaunchAgent."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    pid = str(os.getpid())
+    path.write_text(pid)
+
+    def _cleanup():
+        try:
+            if path.read_text().strip() == pid:
+                path.unlink()
+        except OSError:
+            pass
+
+    atexit.register(_cleanup)
 
 
 def main(argv: list[str]) -> int:
@@ -31,6 +49,8 @@ def main(argv: list[str]) -> int:
     import uvicorn
 
     from .app import create_app
+
+    _write_pidfile(config_mod.data_dirs(cfg)["temp_dir"] / "backend.pid")
 
     # host forzato a 127.0.0.1 (validato anche nel config)
     uvicorn.run(create_app(cfg), host="127.0.0.1", port=cfg["backend"]["port"], log_level="warning", access_log=False)

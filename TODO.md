@@ -51,10 +51,11 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [x] Gestione backend offline durante la registrazione (coda + messaggio)
 - [x] Test API e messaggistica
 
-## Dopo la Fase 5 (PROSSIMA)
-- [ ] Avvio automatico backend con LaunchAgent (D-024): install/uninstall reversibili, start/stop_backend.sh compatibili
+## Dopo la Fase 5 ✅
+- [x] Avvio automatico backend con LaunchAgent (D-024): install/uninstall reversibili, start/stop_backend.sh compatibili
 
-## FASE 6 — Cattura audio
+## FASE 6 — Cattura audio (PROSSIMA)
+- [ ] (U) Verificare che dopo un riavvio/login del Mac il popup mostri PRONTO senza Terminale
 - [ ] Permessi tabCapture + offscreen; offscreen document con MediaRecorder (webm/opus, 5 s) + ChunkUploader
 - [ ] Riproduzione dell'audio della scheda all'utente (tabCapture la silenzia)
 - [ ] Microfono come traccia separata (permesso da settings.html), fallback solo scheda
