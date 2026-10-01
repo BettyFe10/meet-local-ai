@@ -34,3 +34,6 @@ async function load() {
 }
 
 load();
+// aggiornamento periodico leggero mentre la pagina è visibile
+setInterval(() => { if (document.visibilityState === "visible") load(); }, 15000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(); });

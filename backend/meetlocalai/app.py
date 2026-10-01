@@ -6,12 +6,13 @@ import logging
 import time
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, Request
+from fastapi import Body, FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from . import __version__, health, meetings, messages
+from . import __version__, health, meetings, messages, recording
 from . import config as config_mod
 from . import logging_setup
 from .security import SecurityPolicy
@@ -65,16 +66,56 @@ def create_app(cfg: dict | None = None) -> FastAPI:
             },
         }
 
+
+    meetings_dir = config_mod.data_dirs(cfg)["meetings_dir"]
+    recorder = recording.Recorder(cfg, meetings_dir)
+    recorder.recover()
+    app.state.recorder = recorder
+
+    @app.exception_handler(recording.RecordingError)
+    async def _rec_exc(request: Request, exc: recording.RecordingError):
+        return JSONResponse(status_code=exc.status, content={"error_code": exc.code, "user_message": exc.user_message,
+                                                             "detail_logged": False, **exc.extra})
+
+    def _not_found():
+        return JSONResponse(status_code=404, content={"error_code": "meeting_not_found", "user_message": "Riunione non trovata.", "detail_logged": False})
+
     @app.get("/api/v1/status")
     def get_status():
         return {
             "time": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
-            "recording": None,   # Fase 5/6
+            "recording": recorder.status(),
             "processing": None,  # Fase 8
             "queue_length": 0,
         }
 
-    meetings_dir = config_mod.data_dirs(cfg)["meetings_dir"]
+    @app.post("/api/v1/meetings", status_code=201)
+    def post_meeting(payload: dict = Body(default={})):
+        md = recorder.start(payload.get("title"), payload.get("meet_code"), payload.get("tracks") or ["tab"])
+        return md
+
+    @app.post("/api/v1/meetings/{meeting_id}/chunks")
+    async def post_chunk(meeting_id: str, request: Request, track: str = Query(...), seq: int = Query(..., ge=0)):
+        data = await request.body()
+        try:
+            return await run_in_threadpool(recorder.add_chunk, meeting_id, track, seq, data)
+        except meetings.MeetingNotFound:
+            return _not_found()
+
+    @app.post("/api/v1/meetings/{meeting_id}/stop")
+    def post_stop(meeting_id: str, payload: dict = Body(default={})):
+        cd = payload.get("client_duration_seconds")
+        try:
+            return recorder.stop(meeting_id, float(cd) if isinstance(cd, (int, float)) else None)
+        except meetings.MeetingNotFound:
+            return _not_found()
+
+    @app.patch("/api/v1/meetings/{meeting_id}")
+    def patch_meeting(meeting_id: str, payload: dict = Body(...)):
+        try:
+            return recorder.rename(meeting_id, str(payload.get("title", "")))
+        except meetings.MeetingNotFound:
+            return _not_found()
 
     @app.get("/api/v1/meetings")
     def get_meetings():
@@ -85,7 +126,7 @@ def create_app(cfg: dict | None = None) -> FastAPI:
         try:
             return meetings.get_meeting(meetings_dir, meeting_id)
         except meetings.MeetingNotFound:
-            return JSONResponse(status_code=404, content={"error_code": "meeting_not_found", "user_message": "Riunione non trovata.", "detail_logged": False})
+            return _not_found()
 
     log.info("Backend %s avviato (config: %s)", __version__, cfg.get("_config_path"))
     return app

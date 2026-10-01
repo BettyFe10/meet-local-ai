@@ -3,10 +3,27 @@
 <head><meta charset="utf-8"><title>Meet Local AI</title><link rel="stylesheet" href="styles.css"></head>
 <body class="popup">
   <h1>Meet Local AI</h1>
-  <div class="row"><span id="status" class="status wait">● Verifica…</span></div>
-  <div id="hint" class="small muted"></div>
-  <div class="row"><button id="start" class="btn primary" disabled>🔴 INIZIA RIUNIONE</button></div>
-  <div id="startNote" class="small muted"></div>
+
+  <section id="viewIdle">
+    <div class="row"><span id="status" class="status wait">● Verifica…</span></div>
+    <div id="hint" class="small muted"></div>
+    <div class="row" id="titleRow" hidden>
+      <input id="title" type="text" maxlength="200" placeholder="Titolo riunione (facoltativo)">
+    </div>
+    <div class="row"><button id="start" class="btn primary" disabled>🔴 INIZIA RIUNIONE</button></div>
+  </section>
+
+  <section id="viewRec" hidden>
+    <div class="row"><span class="status rec">🔴 REGISTRAZIONE ATTIVA</span></div>
+    <div id="recTitle" class="small muted"></div>
+    <div class="row timer" id="timer">00:00:00</div>
+    <div class="small muted" id="recNote">Versione di prova: l'audio non viene ancora catturato (arriva nella prossima fase).</div>
+    <div class="row"><button id="stop" class="btn">■ TERMINA</button></div>
+  </section>
+
+  <div id="error" class="small status off"></div>
+  <div id="saved" class="small" hidden>✓ Riunione salvata. <a href="#" id="openSaved">Apri</a></div>
+
   <div class="row"><button id="dashboard" class="btn">APRI DASHBOARD</button></div>
   <ul id="components" class="comp"></ul>
   <script type="module" src="popup.js"></script>

@@ -44,15 +44,22 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [x] ID estensione in backend.allowed_extension_ids
 - [x] (U) Caricare l'estensione in Chrome
 
-## FASE 5 — Comunicazione Extension → Backend (PROSSIMA)
-- [ ] API backend: POST /meetings (crea cartella + metadata), POST /meetings/{id}/chunks, POST /meetings/{id}/stop, PATCH titolo, GET /status con registrazione attiva
-- [ ] Service worker: macchina a stati idle → starting → recording → stopping, badge REC, timer
-- [ ] Popup: INIZIA / TERMINA attivi (senza audio reale: chunk di prova), stato persistente se si chiude il popup
-- [ ] Gestione backend offline durante la registrazione (coda + messaggio)
-- [ ] Test API e messaggistica
+## FASE 5 — Comunicazione Extension → Backend ✅
+- [x] API backend: POST /meetings (crea cartella + metadata), POST /meetings/{id}/chunks, POST /meetings/{id}/stop, PATCH titolo, GET /status con registrazione attiva
+- [x] Service worker: macchina a stati idle → starting → recording → stopping, badge REC, timer
+- [x] Popup: INIZIA / TERMINA attivi (senza audio reale), stato persistente se si chiude il popup
+- [x] Gestione backend offline durante la registrazione (coda + messaggio)
+- [x] Test API e messaggistica
 
-## Dopo la Fase 5
-- [ ] Avvio automatico backend con LaunchAgent (D-024)
+## Dopo la Fase 5 (PROSSIMA)
+- [ ] Avvio automatico backend con LaunchAgent (D-024): install/uninstall reversibili, start/stop_backend.sh compatibili
+
+## FASE 6 — Cattura audio
+- [ ] Permessi tabCapture + offscreen; offscreen document con MediaRecorder (webm/opus, 5 s) + ChunkUploader
+- [ ] Riproduzione dell'audio della scheda all'utente (tabCapture la silenzia)
+- [ ] Microfono come traccia separata (permesso da settings.html), fallback solo scheda
+- [ ] Stop: flush della coda prima di chiudere la riunione
+- [ ] (U) Test con una vera chiamata Meet
 
 ## FASE 6–16
 - [ ] Vedi ordine fasi nel brief (Audio → Whisper → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
@@ -66,5 +73,5 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 
 ## Debito tecnico / note
 - [ ] Starlette segnala che `httpx` per TestClient è deprecato (suggerisce `httpx2`): solo test, nessun impatto runtime. Rivalutare quando si aggiornano le dipendenze.
-- [ ] Avvio automatico del backend al login con LaunchAgent (D-024) — subito dopo la Fase 5, con install/uninstall reversibile
 - [ ] Ollama: keep_alive breve per liberare la RAM dopo la sintesi (Fase 9)
+- [ ] Dipendenze transitive (es. rpds-py) non fissate: valutare un lock file completo in Fase 14.

@@ -96,7 +96,7 @@ def test_api_client_always_sends_client_header():
 @pytest.mark.skipif(shutil.which("node") is None, reason="node non installato")
 def test_js_syntax(tmp_path):
     for js in EXT.rglob("*.js"):
-        copy = tmp_path / (js.stem + ".mjs")
+        copy = tmp_path / (js.parent.name + "_" + js.stem + ".mjs")
         copy.write_text(js.read_text(encoding="utf-8"), encoding="utf-8")
         r = subprocess.run(["node", "--check", str(copy)], capture_output=True, text=True)
         assert r.returncode == 0, f"{js.name}: {r.stderr}"

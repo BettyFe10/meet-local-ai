@@ -12,23 +12,28 @@ export async function baseUrl() {
 }
 
 export class BackendError extends Error {
-  constructor(userMessage, code, status = 0) {
+  constructor(userMessage, code, status = 0, data = null) {
     super(userMessage);
     this.userMessage = userMessage;
     this.code = code;
     this.status = status;
+    this.data = data;
   }
 }
 
-export async function request(path, { method = "GET", body, timeoutMs = 4000 } = {}) {
+export async function request(path, { method = "GET", body, rawBody, contentType, timeoutMs = 4000 } = {}) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   let res;
   try {
     res = await fetch((await baseUrl()) + path, {
       method,
-      headers: { "X-MeetLocalAI": "1", ...(body ? { "Content-Type": "application/json" } : {}) },
-      body: body ? JSON.stringify(body) : undefined,
+      headers: {
+        "X-MeetLocalAI": "1",
+        ...(body ? { "Content-Type": "application/json" } : {}),
+        ...(rawBody ? { "Content-Type": contentType || "application/octet-stream" } : {}),
+      },
+      body: rawBody ?? (body ? JSON.stringify(body) : undefined),
       signal: ctrl.signal,
       cache: "no-store",
     });
@@ -42,7 +47,7 @@ export async function request(path, { method = "GET", body, timeoutMs = 4000 } =
   try { data = await res.json(); } catch { /* risposta non JSON */ }
   if (!res.ok) {
     const msg = data?.user_message || "Si è verificato un errore. I dettagli sono nei log del backend.";
-    throw new BackendError(msg, data?.error_code || `http_${res.status}`, res.status);
+    throw new BackendError(msg, data?.error_code || `http_${res.status}`, res.status, data);
   }
   return data;
 }
@@ -50,3 +55,11 @@ export async function request(path, { method = "GET", body, timeoutMs = 4000 } =
 export const getHealth = () => request("/health", { timeoutMs: 3000 });
 export const listMeetings = () => request("/meetings");
 export const getMeeting = (id) => request(`/meetings/${encodeURIComponent(id)}`);
+export const getStatus = () => request("/status");
+export const startMeeting = (payload) => request("/meetings", { method: "POST", body: payload, timeoutMs: 8000 });
+export const stopMeeting = (id, clientDurationSeconds) =>
+  request(`/meetings/${encodeURIComponent(id)}/stop`, { method: "POST", body: { client_duration_seconds: clientDurationSeconds }, timeoutMs: 8000 });
+export const renameMeeting = (id, title) => request(`/meetings/${encodeURIComponent(id)}`, { method: "PATCH", body: { title } });
+export const sendChunk = (id, track, seq, blob) =>
+  request(`/meetings/${encodeURIComponent(id)}/chunks?track=${encodeURIComponent(track)}&seq=${seq}`,
+    { method: "POST", rawBody: blob, contentType: "audio/webm", timeoutMs: 15000 });

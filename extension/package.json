@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Solo per Node (test): i file .js dell'estensione sono moduli ES. Chrome ignora questo file."
+}

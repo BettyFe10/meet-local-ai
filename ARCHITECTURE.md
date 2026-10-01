@@ -57,6 +57,8 @@ backend/
     paths.py          REPO_ROOT ricavato dal file; MEETLOCALAI_CONFIG sovrascrive il percorso config
     security.py       middleware Host / Origin / X-MeetLocalAI / CORS
     health.py         controlli FFmpeg e Ollama (solo stdlib)
+    meetings.py       lettura riunioni dal filesystem
+    recording.py      avvio/chunk/stop/rinomina, recupero dopo riavvio, metadata atomici
     logging_setup.py  RotatingFileHandler in <logs_dir>/backend.log
     messages.py       testi fissi per l'utente
   .venv/              (non versionato) creato da installer/setup_backend.sh
@@ -69,6 +71,8 @@ PID del backend: `<temp_dir>/backend.pid`; output di processo: `<logs_dir>/backe
 |---|---|
 | `manifest.json` | permessi attuali: `storage`; host: `https://meet.google.com/*`, `http://127.0.0.1/*`; dalla Fase 6 anche `tabCapture`, `offscreen`. `key` fissa → ID `lpdaoidkipjcdboiepcogiopcnhohiaa` su ogni computer |
 | `lib/api.js` | client HTTP verso il backend (header `X-MeetLocalAI`, timeout, "Backend offline.") |
+| `lib/controller.js` | macchina a stati della registrazione (pura, testata con Node) |
+| `lib/uploader.js` | coda dei chunk audio verso il backend: ordine, ritentativi, limite memoria |
 | `lib/ui.js` | utilità DOM sicure (solo textContent), formattazione date/durate/stati, rilevamento codice Meet |
 | `popup.html/js` | stato (PRONTO / REGISTRAZIONE ATTIVA + timer), titolo opzionale, INIZIA / TERMINA, APRI DASHBOARD |
 | `service_worker.js` | macchina a stati, badge "REC" sull'icona, crea/chiude l'offscreen document |

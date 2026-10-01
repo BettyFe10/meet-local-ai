@@ -55,5 +55,21 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Consumo backend a riposo | Mac M4 | MISURATO | ps: 0,1% CPU, 33,5 MB RSS dopo 60 s; top: 0,2% CPU, 36 MB |
 | Port personalizzata da Impostazioni | — | NON TESTATA | |
 
+## Fase 5 — 2026-10-01
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite pytest completa (65: backend, registrazione, statici, 3 suite Node) | VM Linux | SUPERATO | |
+| setup_backend.sh con nuova dipendenza (jsonschema) + suite | Mac | SUPERATO | dipendenza installata, backend riavviato |
+| API registrazione: start/chunk/dup/gap/limite/stop/rename/riavvio→interrupted→ripresa | VM Linux | SUPERATO | test_recording.py |
+| Metadata generati conformi a metadata.schema.json (start e stop) | VM Linux | SUPERATO | |
+| Controller estensione (start, doppio start, offline, stop, chiusura scheda, resync) | Node 22 | SUPERATO | controller.test.mjs |
+| Uploader chunk (ordine, ritentativi offline, seq_gap, not_recording, limite coda) | Node 22 | SUPERATO | uploader.test.mjs |
+| INIZIA → cartella + metadata `recording` → TERMINA → `stopped` con durata | Mac + Chrome 153 | SUPERATO | 2026-10-01_19-09_Riunione-pcm-iaqh-vds (10 s) |
+| Stop automatico alla chiusura della scheda Meet | Mac + Chrome | SUPERATO | 2ª riunione chiusa senza popup aperto (log) |
+| Badge REC, timer persistente alla riapertura del popup, "Apri" riunione, dashboard | Mac + Chrome | SUPERATO | prova manuale dell'utente |
+| Invio chunk reali dall'estensione | — | NON TESTATA | nessuna sorgente audio fino alla Fase 6 |
+| Backend offline durante la registrazione (coda) in Chrome reale | — | NON TESTATA | coperto solo da test unitari |
+| Durate < 1 min mostrate come "0 min" | — | CORRETTO | ora "10 s" (ui.test.mjs) |
+
 ## Benchmark
 Nessun benchmark ancora eseguito (previsto in Fase 7 per Whisper e Fase 9 per LLM).

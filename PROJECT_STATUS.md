@@ -1,8 +1,16 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-01
-**Fase corrente:** FASE 4 — Chrome Extension minima → ✅ COMPLETATA (provata in Chrome sul Mac)
-**Prossima fase:** FASE 5 — Comunicazione Extension → Backend (NON ANCORA INIZIATA)
+**Fase corrente:** FASE 5 — Comunicazione Extension → Backend → ✅ COMPLETATA (provata in Chrome sul Mac)
+**Prossima attività:** Avvio automatico del backend al login (LaunchAgent, D-024), poi FASE 6 — Cattura audio
+
+## Fase 5 — cosa è stato fatto
+- Backend `recording.py`: `POST /meetings` (cartella `YYYY-MM-DD_HH-MM_Titolo` + `raw/` + metadata `recording`), `POST /meetings/{id}/chunks?track=&seq=` (append ordinato, duplicati ignorati, buchi → 409 con `next_seq`, max 10 MB, fsync), `POST /meetings/{id}/stop` (durata, `stopped`, idempotente), `PATCH /meetings/{id}` (titolo), `GET /status` con registrazione attiva. Una registrazione alla volta; controllo spazio disco (≥1 GB); scrittura metadata atomica; al riavvio `recording` → `interrupted` con ripresa possibile.
+- Estensione: `lib/controller.js` (macchina a stati idle/starting/recording/stopping, logica pura testata), `lib/uploader.js` (coda chunk con ritentativi e limite memoria — userà l'audio della Fase 6), service worker con badge **REC**, stop automatico alla chiusura della scheda Meet, riallineamento con il backend all'avvio. Popup con titolo facoltativo, INIZIA/TERMINA, timer persistente, "Riunione salvata → Apri". Dashboard con aggiornamento automatico.
+- Il popup dichiara esplicitamente che l'audio non viene ancora catturato.
+- Test: 65 pytest (di cui 3 suite Node con 19 test JS: controller, uploader, ui).
+- Prova sul Mac: 2 registrazioni create e chiuse correttamente (la seconda fermata dalla chiusura della scheda Meet), metadata coerenti.
+- Riunioni di prova presenti in `~/MeetLocalAI/Meetings/` (2026-10-01_19-09_Riunione-pcm-iaqh-vds e _2): eliminabili.
 
 ## Fase 4 — cosa è stato fatto
 - `extension/` MV3: manifest con `key` fissa → **ID stabile `lpdaoidkipjcdboiepcogiopcnhohiaa`** su ogni Mac; permessi minimi (`storage`; host `meet.google.com` e `127.0.0.1`).
@@ -86,5 +94,5 @@ cd ~/MeetLocalAI/app && ./start_backend.sh     # avvia
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 5.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → fare l'avvio automatico (LaunchAgent), poi FASE 6.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).
