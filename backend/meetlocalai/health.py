@@ -31,3 +31,11 @@ def check_ollama(base_url: str, timeout: float = 1.5) -> dict:
     except Exception as e:  # noqa: BLE001 - qualsiasi errore = non disponibile
         log.info("Ollama non raggiungibile su %s: %s", base_url, type(e).__name__)
         return {"available": False, "version": None}
+
+
+def check_whisper(cfg: dict, models_dir) -> dict:
+    from . import transcribe  # noqa: PLC0415
+    eng = transcribe.select_engine(cfg, models_dir)
+    if eng is None:
+        return {"available": False, "engine": None, "model": None}
+    return {"available": True, "engine": eng.name, "model": eng.model}

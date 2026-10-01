@@ -1,0 +1,3 @@
+# Motore Whisper MLX (solo Mac Apple Silicon). Porta con sé torch/numba/scipy (~0,5-1 GB).
+-r requirements.txt
+mlx-whisper==0.4.3

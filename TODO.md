@@ -66,14 +66,24 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] Rilevare automaticamente una traccia della scheda completamente muta e avvisare l'utente durante la registrazione
 - [ ] Backend offline durante una registrazione reale (coda) — NON TESTATA in Chrome
 
-## FASE 7 — Whisper locale (PROSSIMA)
-- [ ] (U) Installare FFmpeg (`brew install ffmpeg`)
-- [ ] Conversione raw/*.webm → WAV 16 kHz mono per traccia + audio.wav mix
-- [ ] Benchmark mlx-whisper vs whisper.cpp (large-v3-turbo; fallback small/medium) su audio italiano: velocità, RAM, qualità
-- [ ] Scaricare solo il modello scelto in ~/MeetLocalAI/Models
-- [ ] Integrare nel backend + health "Whisper disponibile"
+## FASE 7 — Whisper locale ✅
+- [x] (U) Installare FFmpeg (`brew install ffmpeg`)
+- [x] Conversione raw/*.webm → WAV 16 kHz mono per traccia + audio.wav mix
+- [x] Benchmark mlx-whisper vs whisper.cpp (large-v3-turbo; fallback small/medium) su audio italiano: velocità, RAM, qualità
+- [x] Scaricare solo il modello scelto in ~/MeetLocalAI/Models
+- [x] Integrare nel backend + health "Whisper disponibile"
 
-## FASE 8–16
+- [ ] (U) Ricreare il venv senza mlx/torch (vedi PROJECT_STATUS)
+
+## FASE 8 — Trascrizione completa (PROSSIMA)
+- [ ] Pipeline automatica dopo TERMINA: converting → transcribing (coda FIFO, una alla volta)
+- [ ] Trascrizione per traccia e unione per timestamp; etichette "Microfono locale" / "Partecipanti" (D-015), nessun nome inventato
+- [ ] transcript.txt + transcript.md con [hh:mm:ss]; metadata (motore, modello, tempi, RTF)
+- [ ] Ottimizzare velocità su audio lunghi (beam size, thread, flash attention) e misurare su ≥10 min
+- [ ] Filtrare allucinazioni tipiche su silenzio; pulizia WAV temporanei
+- [ ] Riprocessare riunioni già registrate (endpoint reprocess)
+
+## FASE 9–16
 - [ ] Vedi ordine fasi nel brief (Trascrizione completa → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
 
 ## Installazioni previste (NON ancora eseguite)

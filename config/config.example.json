@@ -11,7 +11,9 @@
   "backend": {
     "host": "127.0.0.1",
     "port": 8765,
-    "allowed_extension_ids": ["lpdaoidkipjcdboiepcogiopcnhohiaa"]
+    "allowed_extension_ids": [
+      "lpdaoidkipjcdboiepcogiopcnhohiaa"
+    ]
   },
   "audio": {
     "capture_tab": true,
@@ -22,8 +24,8 @@
     "keep_raw_tracks": true
   },
   "transcription": {
-    "engine": "auto",
-    "model": "auto",
+    "engine": "whispercpp",
+    "model": "large-v3-turbo",
     "language": "it",
     "detect_language": false,
     "timestamps": true,

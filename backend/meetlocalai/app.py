@@ -48,6 +48,7 @@ def create_app(cfg: dict | None = None) -> FastAPI:
     @app.get("/api/v1/health")
     def get_health():
         ff = health.check_ffmpeg()
+        wh = health.check_whisper(cfg, config_mod.data_dirs(cfg)["models_dir"])
         ol = health.check_ollama(cfg["llm"]["base_url"])
         llm_model = cfg["llm"].get("model") or None
         return {
@@ -55,8 +56,7 @@ def create_app(cfg: dict | None = None) -> FastAPI:
             "version": __version__,
             "uptime_seconds": round(time.time() - started_at, 1),
             "ffmpeg": {"available": ff["available"], "user_message": None if ff["available"] else messages.FFMPEG_UNAVAILABLE},
-            # Whisper viene integrato in Fase 7: finché non c'è, è dichiarato non disponibile.
-            "whisper": {"available": False, "engine": None, "model": None, "user_message": messages.WHISPER_UNAVAILABLE},
+            "whisper": {**wh, "user_message": None if wh["available"] else messages.WHISPER_UNAVAILABLE},
             "llm": {
                 "available": ol["available"] and llm_model is not None,
                 "provider": cfg["llm"]["provider"],

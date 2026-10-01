@@ -59,6 +59,9 @@ backend/
     health.py         controlli FFmpeg e Ollama (solo stdlib)
     meetings.py       lettura riunioni dal filesystem
     recording.py      avvio/chunk/stop/rinomina, recupero dopo riavvio, metadata atomici
+    audio.py          FFmpeg: webm→WAV 16 kHz mono, mix tracce
+    transcribe.py     motori Whisper (whisper.cpp predefinito; mlx opzionale), senza rete
+    bench.py          benchmark motori (tempo, RTF, RAM)
     logging_setup.py  RotatingFileHandler in <logs_dir>/backend.log
     messages.py       testi fissi per l'utente
   .venv/              (non versionato) creato da installer/setup_backend.sh

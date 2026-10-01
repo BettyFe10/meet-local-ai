@@ -96,5 +96,25 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Microfono negato → solo scheda con avviso | Node (fake) | SUPERATO | non provato in Chrome reale |
 | Fine cattura / chiusura scheda durante registrazione reale | — | NON TESTATA | coperta da test unitari |
 
+## Fase 7 — 2026-10-01
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (85 test) | VM Linux | SUPERATO | conversione/mix reali con ffmpeg, whisper-cli finto, benchmark end-to-end |
+| Installazione whisper.cpp 1.9.4 + modelli | Mac | SUPERATO | download modelli ~1 min ciascuno |
+| Conversione 2 tracce (68,6 s) | Mac | SUPERATO | 0,25 s |
+| Benchmark motori | Mac M4 | SUPERATO | tabella sotto |
+| Riepilogo benchmark senza testo delle riunioni nei log | VM + Mac | SUPERATO | solo numeri in Logs/ |
+| Velocità su riunioni lunghe (≥10 min) | — | NON TESTATA | Fase 8 |
+
 ## Benchmark
-Nessun benchmark ancora eseguito (previsto in Fase 7 per Whisper e Fase 9 per LLM).
+### Whisper — 2026-10-01, Mac mini M4 16 GB, riunione di test 68,6 s (tracce: scheda + microfono), modello large-v3-turbo
+| Motore | Traccia | Tempo | Rapporto realtime | RAM max* | Segmenti / caratteri |
+|---|---|---|---|---|---|
+| mlx-whisper 0.4.3 (mlx 0.32.3) | scheda | 33,8 s | 0,49 | 638 MB | 21 / 554 |
+| mlx-whisper | microfono | 4,1 s | 0,06 | 1755 MB | 8 / 393 |
+| whisper.cpp 1.9.4 (Metal) | scheda | 21,8 s | 0,32 | 1910 MB | 12 / 581 |
+| whisper.cpp | microfono | 6,5 s | 0,10 | 1854 MB | 8 / 399 |
+
+*RSS del processo (`/usr/bin/time -l`); con MLX parte della memoria GPU unificata può non essere conteggiata.
+Note: tempi comprensivi del caricamento modello; mlx ha eseguito per primo (possibile costo di compilazione iniziale). Campione breve: non rappresentativo di riunioni di 1 ora.
+Qualità (lettura delle trascrizioni di prova): molto simile; whisper.cpp produce frasi intere e punteggiatura più regolare, mlx frammenta di più e ha qualche errore grammaticale in più. Nessuna allucinazione sui silenzi lunghi del microfono con entrambi.

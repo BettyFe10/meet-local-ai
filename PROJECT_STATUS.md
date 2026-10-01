@@ -1,8 +1,17 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-01
-**Fase corrente:** FASE 6 — Cattura audio → ✅ COMPLETATA (chiamata Meet reale registrata sul Mac)
-**Prossima fase:** FASE 7 — Whisper locale (NON ANCORA INIZIATA)
+**Fase corrente:** FASE 7 — Whisper locale → ✅ COMPLETATA (benchmark sul Mac, motore scelto: whisper.cpp)
+**Prossima fase:** FASE 8 — Trascrizione completa (NON ANCORA INIZIATA)
+
+## Fase 7 — cosa è stato fatto
+- Backend: `audio.py` (FFmpeg: webm → WAV 16 kHz mono, mix delle tracce → `audio.wav`), `transcribe.py` (motori `whispercpp` e `mlx`, trascrizione senza rete: HF_HUB_OFFLINE), `bench.py` (tempo, RTF, RAM con `/usr/bin/time -l`), health "Whisper" reale.
+- Sul Mac installati: FFmpeg 9.0.2 (già presente), whisper.cpp 1.9.4 (Homebrew, Metal), modello `~/MeetLocalAI/Models/whispercpp/ggml-large-v3-turbo.bin` (1,5 GB).
+- Benchmark su RIUNIONE-DI-TEST (68,6 s, 2 tracce) — vedi TEST_RESULTS.md. Qualità italiana simile; whisper.cpp con frasi e punteggiatura migliori, più veloce sulla traccia principale, installazione molto più leggera → **scelto whisper.cpp + large-v3-turbo** (D-033).
+- Rimossi: modello MLX (`Models/hf`, 1,5 GB). Da fare dall'utente: ricreare l'ambiente Python senza mlx/torch (comando in "Operazioni utente").
+- `installer/setup_whisper.sh`: installazione definitiva (whisper-cpp + modello), idempotente. `installer/whisper_benchmark.sh` resta come strumento facoltativo.
+- Config: `transcription.engine = whispercpp`, `model = large-v3-turbo` (esempio e locale).
+- Test: 85.
 
 ## Fase 6 — cosa è stato fatto
 - Permessi estensione: `storage`, `tabCapture`, `offscreen`.
@@ -109,9 +118,10 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 4. Le mie azioni sul Mac passano da una VM che vede solo `~/MeetLocalAI`: installazioni di sistema (brew, Ollama) e il caricamento dell'estensione in Chrome richiederanno che l'utente esegua comandi/script forniti.
 
 ## Operazioni che richiedono intervento dell'utente
+- Se non ancora fatto: ricreare l'ambiente Python senza i pacchetti MLX: `cd ~/MeetLocalAI/app && ./stop_backend.sh && rm -rf backend/.venv && bash installer/setup_backend.sh && ./start_backend.sh`
 - (Opzionale, quando vuoi) Pubblicare su GitHub privato seguendo `docs/GITHUB.md` (creare repo + `git push`).
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 7.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 8.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).
