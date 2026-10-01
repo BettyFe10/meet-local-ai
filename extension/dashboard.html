@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="it">
+<head><meta charset="utf-8"><title>Meet Local AI — Riunioni</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <h1>Meet Local AI</h1>
+    <nav><a href="dashboard.html" class="active">Riunioni</a><a href="settings.html">Impostazioni</a></nav>
+  </div>
+  <div id="banner"></div>
+  <h2>Riunioni recenti</h2>
+  <table>
+    <thead><tr><th>Data</th><th>Ora</th><th>Titolo</th><th>Durata</th><th>Stato</th></tr></thead>
+    <tbody id="rows"><tr><td colspan="5" class="empty">Caricamento…</td></tr></tbody>
+  </table>
+</div>
+<script type="module" src="dashboard.js"></script>
+</body>
+</html>

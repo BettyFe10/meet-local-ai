@@ -43,5 +43,17 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Porta 8765 occupata da altro programma → messaggio chiaro | — | NON TESTATA | logica presente in start_backend.sh |
 | Chrome Extension | — | NON TESTATA | Fase 4 |
 
+## Fase 4 — 2026-09-29 / 10-01
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite pytest completa (49 test: backend + statici estensione) | VM Linux | SUPERATO | inclusi sintassi JS (node --check), assenza script inline/URL remoti, ID = allowlist |
+| Endpoint /meetings e /meetings/{id} (lista ordinata, metadata corrotti ignorati, ID non validi/traversal → 404) | VM Linux | SUPERATO | |
+| Estensione caricata in Chrome 153 (non pacchettizzata) con ID atteso | Mac | SUPERATO | confermato dall'utente |
+| Popup / dashboard / impostazioni contattano il backend | Mac | SUPERATO | 3 richieste health dall'estensione nel log, nessun rifiuto di Origin |
+| Allowlist estensione attiva (nessun avviso "modalità sviluppo" all'avvio) | Mac | SUPERATO | log 2026-10-01 |
+| Popup "Backend offline." a backend fermo; "Riunione rilevata" su scheda Meet | Mac | SUPERATO | prova manuale dell'utente ("fatto"), non verificabile dai log |
+| Consumo backend a riposo | Mac M4 | MISURATO | ps: 0,1% CPU, 33,5 MB RSS dopo 60 s; top: 0,2% CPU, 36 MB |
+| Port personalizzata da Impostazioni | — | NON TESTATA | |
+
 ## Benchmark
 Nessun benchmark ancora eseguito (previsto in Fase 7 per Whisper e Fase 9 per LLM).

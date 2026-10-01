@@ -11,7 +11,7 @@
   "backend": {
     "host": "127.0.0.1",
     "port": 8765,
-    "allowed_extension_ids": []
+    "allowed_extension_ids": ["lpdaoidkipjcdboiepcogiopcnhohiaa"]
   },
   "audio": {
     "capture_tab": true,

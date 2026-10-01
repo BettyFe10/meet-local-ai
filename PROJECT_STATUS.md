@@ -1,8 +1,17 @@
 # PROJECT_STATUS — Meet Local AI
 
-**Ultimo aggiornamento:** 2026-09-29
-**Fase corrente:** FASE 3 — Backend minimo → ✅ COMPLETATA (verificata sul Mac)
-**Prossima fase:** FASE 4 — Chrome Extension minima (NON ANCORA INIZIATA)
+**Ultimo aggiornamento:** 2026-10-01
+**Fase corrente:** FASE 4 — Chrome Extension minima → ✅ COMPLETATA (provata in Chrome sul Mac)
+**Prossima fase:** FASE 5 — Comunicazione Extension → Backend (NON ANCORA INIZIATA)
+
+## Fase 4 — cosa è stato fatto
+- `extension/` MV3: manifest con `key` fissa → **ID stabile `lpdaoidkipjcdboiepcogiopcnhohiaa`** su ogni Mac; permessi minimi (`storage`; host `meet.google.com` e `127.0.0.1`).
+- Pagine: popup (PRONTO / Backend offline, riunione Meet rilevata, componenti), dashboard (elenco riunioni), meeting (dettaglio con sezioni vuote), settings (porta, verifica connessione, ID). Service worker con stato `idle`. HTML/CSS/JS vanilla, nessuno script inline, nessun URL remoto.
+- Backend: nuovi endpoint `GET /api/v1/meetings` e `GET /api/v1/meetings/{id}` (lettura da filesystem, ID validato, niente path traversal).
+- Sicurezza: `allowed_extension_ids` = ID ufficiale (config di esempio e config locale) → fine modalità sviluppo; altre estensioni e siti rifiutati.
+- Chiave di firma dell'estensione: `~/MeetLocalAI/Config/extension-signing-key.pem` (FUORI dal repo; serve solo per un futuro pacchetto .crx/.zip firmato con lo stesso ID — farne backup).
+- Test: 49 (backend + controlli statici estensione), tutti superati.
+- Consumi backend a riposo misurati sul Mac: **~0,1–0,2% CPU, ~34 MB RAM** → confermato avvio automatico sempre attivo (D-024).
 
 ## Fase 3 — cosa è stato fatto
 - `backend/meetlocalai/`: config (default da esempio + override locale, validazione host/porta/LLM loopback), log rotanti in `Logs/backend.log`, sicurezza (Host, Origin estensione, header `X-MeetLocalAI`), messaggi utente fissi, API `/api/v1/health` e `/api/v1/status`, CLI `python -m meetlocalai [--print-port|--print-dir|--check-config]`.
@@ -74,8 +83,8 @@ cd ~/MeetLocalAI/app && ./start_backend.sh     # avvia
 
 ## Operazioni che richiedono intervento dell'utente
 - (Opzionale, quando vuoi) Pubblicare su GitHub privato seguendo `docs/GITHUB.md` (creare repo + `git push`).
-- In Fase 4: caricare l'estensione in Chrome (istruzioni fornite).
+- Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 4.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 5.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).

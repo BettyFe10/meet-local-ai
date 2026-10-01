@@ -37,15 +37,25 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [x] Logging rotante in ~/MeetLocalAI/Logs
 - [x] start_backend.sh / stop_backend.sh
 
-## FASE 4 — Chrome Extension minima (PROSSIMA)
-- [ ] manifest.json MV3 con key fissa, permessi minimi
-- [ ] popup (PRONTO / Backend offline), dashboard, meeting, settings (vuoti ma navigabili)
-- [ ] service worker con macchina a stati
-- [ ] ID estensione in backend.allowed_extension_ids
-- [ ] (U) Caricare l'estensione in Chrome
+## FASE 4 — Chrome Extension minima ✅
+- [x] manifest.json MV3 con key fissa, permessi minimi
+- [x] popup (PRONTO / Backend offline), dashboard, meeting, settings (vuoti ma navigabili)
+- [x] service worker con macchina a stati
+- [x] ID estensione in backend.allowed_extension_ids
+- [x] (U) Caricare l'estensione in Chrome
 
-## FASE 5–16
-- [ ] Vedi ordine fasi nel brief (Comunicazione → Audio → Whisper → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
+## FASE 5 — Comunicazione Extension → Backend (PROSSIMA)
+- [ ] API backend: POST /meetings (crea cartella + metadata), POST /meetings/{id}/chunks, POST /meetings/{id}/stop, PATCH titolo, GET /status con registrazione attiva
+- [ ] Service worker: macchina a stati idle → starting → recording → stopping, badge REC, timer
+- [ ] Popup: INIZIA / TERMINA attivi (senza audio reale: chunk di prova), stato persistente se si chiude il popup
+- [ ] Gestione backend offline durante la registrazione (coda + messaggio)
+- [ ] Test API e messaggistica
+
+## Dopo la Fase 5
+- [ ] Avvio automatico backend con LaunchAgent (D-024)
+
+## FASE 6–16
+- [ ] Vedi ordine fasi nel brief (Audio → Whisper → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
 
 ## Installazioni previste (NON ancora eseguite)
 - [ ] (U) `brew install ffmpeg` — Fase 6/7
@@ -56,4 +66,5 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 
 ## Debito tecnico / note
 - [ ] Starlette segnala che `httpx` per TestClient è deprecato (suggerisce `httpx2`): solo test, nessun impatto runtime. Rivalutare quando si aggiornano le dipendenze.
-- [ ] Avvio automatico del backend al login (launchd) — valutare in Fase 14.
+- [ ] Avvio automatico del backend al login con LaunchAgent (D-024) — subito dopo la Fase 5, con install/uninstall reversibile
+- [ ] Ollama: keep_alive breve per liberare la RAM dopo la sintesi (Fase 9)

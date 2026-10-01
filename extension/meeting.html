@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="it">
+<head><meta charset="utf-8"><title>Meet Local AI — Riunione</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <h1 id="title">Riunione</h1>
+    <nav><a href="dashboard.html">← Riunioni</a><a href="settings.html">Impostazioni</a></nav>
+  </div>
+  <div id="banner"></div>
+  <div class="meta"><span id="date">—</span><span id="duration">—</span><span id="status">—</span></div>
+  <div class="actions">
+    <button class="btn inline" id="btnTranscript" disabled>Trascrizione</button>
+    <button class="btn inline" id="btnAudio" disabled>Audio</button>
+    <button class="btn inline" id="btnFolder" disabled>Apri cartella</button>
+  </div>
+  <div id="sections"></div>
+</div>
+<script type="module" src="meeting.js"></script>
+</body>
+</html>

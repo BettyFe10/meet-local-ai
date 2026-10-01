@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Meet Local AI",
+  "short_name": "MeetLocalAI",
+  "version": "0.1.0",
+  "description": "Registra, trascrive e sintetizza le riunioni Google Meet interamente sul tuo Mac. Nessun dato inviato al cloud.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAysWq24QKAKWN1mX0ApoCV8vcbMW6HxCMZnonkkOGJm9cLYOVQW9Fnm/SX70ks6MxzDy7usQzOlZsXWuDW5plIB9SFv86jyDbVE1PisA52SgQoOD930rMJs9qCVqbX1mnuTB+hFSUUkWoNkjkybLcDZXfDCnATellZn/2vTK9BtPlLAAfiHOpofKdqPmD7zyL7HcJEE7b5Tqkz9IIAdDmUyPkw2BoqLhbUiIeO1+TTFHj+bg5NwRGSgz7hi8ZSU7ja6Fr5+1y7/YQXbRvrdTxiCBUL96qKOf+rd2UF5SPWOxvv8855KJZ6NqylYY8jL/UlgfmW/NIKumRC97JTN1HHQIDAQAB",
+  "minimum_chrome_version": "116",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://meet.google.com/*",
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "service_worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Meet Local AI",
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png" }
+  },
+  "icons": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "options_page": "settings.html"
+}

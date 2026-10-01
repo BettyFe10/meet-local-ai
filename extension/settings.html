@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="it">
+<head><meta charset="utf-8"><title>Meet Local AI — Impostazioni</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <h1>Impostazioni</h1>
+    <nav><a href="dashboard.html">Riunioni</a><a href="settings.html" class="active">Impostazioni</a></nav>
+  </div>
+  <div class="card">
+    <h2>Backend locale</h2>
+    <p class="small muted">Il backend ascolta solo su questo computer (127.0.0.1).</p>
+    <label for="port">Porta</label>
+    <input type="number" id="port" min="1024" max="65535">
+    <div class="actions">
+      <button class="btn inline" id="save">Salva</button>
+      <button class="btn inline" id="test">Verifica connessione</button>
+    </div>
+    <div id="result" class="small"></div>
+  </div>
+  <h2>Informazioni</h2>
+  <div class="card small">
+    <div>Versione estensione: <span id="version"></span></div>
+    <div>ID estensione: <code id="extId"></code></div>
+  </div>
+</div>
+<script type="module" src="settings.js"></script>
+</body>
+</html>

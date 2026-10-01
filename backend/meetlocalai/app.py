@@ -11,7 +11,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from . import __version__, health, messages
+from . import __version__, health, meetings, messages
 from . import config as config_mod
 from . import logging_setup
 from .security import SecurityPolicy
@@ -73,6 +73,19 @@ def create_app(cfg: dict | None = None) -> FastAPI:
             "processing": None,  # Fase 8
             "queue_length": 0,
         }
+
+    meetings_dir = config_mod.data_dirs(cfg)["meetings_dir"]
+
+    @app.get("/api/v1/meetings")
+    def get_meetings():
+        return {"meetings": meetings.list_meetings(meetings_dir)}
+
+    @app.get("/api/v1/meetings/{meeting_id}")
+    def get_meeting(meeting_id: str):
+        try:
+            return meetings.get_meeting(meetings_dir, meeting_id)
+        except meetings.MeetingNotFound:
+            return JSONResponse(status_code=404, content={"error_code": "meeting_not_found", "user_message": "Riunione non trovata.", "detail_logged": False})
 
     log.info("Backend %s avviato (config: %s)", __version__, cfg.get("_config_path"))
     return app

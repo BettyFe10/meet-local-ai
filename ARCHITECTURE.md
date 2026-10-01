@@ -67,7 +67,9 @@ PID del backend: `<temp_dir>/backend.pid`; output di processo: `<logs_dir>/backe
 ## 3. Chrome Extension (MV3)
 | File | Ruolo |
 |---|---|
-| `manifest.json` | permessi: `tabCapture`, `offscreen`, `storage`; host: `https://meet.google.com/*`, `http://127.0.0.1:8765/*`; `key` fissa → ID estensione stabile su ogni computer |
+| `manifest.json` | permessi attuali: `storage`; host: `https://meet.google.com/*`, `http://127.0.0.1/*`; dalla Fase 6 anche `tabCapture`, `offscreen`. `key` fissa → ID `lpdaoidkipjcdboiepcogiopcnhohiaa` su ogni computer |
+| `lib/api.js` | client HTTP verso il backend (header `X-MeetLocalAI`, timeout, "Backend offline.") |
+| `lib/ui.js` | utilità DOM sicure (solo textContent), formattazione date/durate/stati, rilevamento codice Meet |
 | `popup.html/js` | stato (PRONTO / REGISTRAZIONE ATTIVA + timer), titolo opzionale, INIZIA / TERMINA, APRI DASHBOARD |
 | `service_worker.js` | macchina a stati, badge "REC" sull'icona, crea/chiude l'offscreen document |
 | `offscreen.html/js` | unico punto dove vive l'audio: MediaRecorder (webm/opus, timeslice 5 s), riproduce l'audio della scheda all'utente (tabCapture altrimenti lo silenzia), invia i chunk |
