@@ -61,7 +61,8 @@ backend/
     recording.py      avvio/chunk/stop/rinomina, recupero dopo riavvio, metadata atomici
     audio.py          FFmpeg: webm→WAV 16 kHz mono, mix tracce
     transcribe.py     motori Whisper (whisper.cpp predefinito; mlx opzionale), senza rete
-    bench.py          benchmark motori (tempo, RTF, RAM)
+    bench.py          benchmark motori (tempo, RTF, RAM; --repeat, --no-vad)
+    processing.py     coda di elaborazione: conversione → trascrizione → file transcript.*
     logging_setup.py  RotatingFileHandler in <logs_dir>/backend.log
     messages.py       testi fissi per l'utente
   .venv/              (non versionato) creato da installer/setup_backend.sh
@@ -111,7 +112,7 @@ Impostazioni leggere in `chrome.storage.local`; impostazioni di elaborazione nel
 | GET | `/meetings/{id}/transcript?format=txt\|md` | testo |
 | GET | `/meetings/{id}/audio` | `audio/wav`, supporta HTTP Range |
 | GET | `/meetings/{id}/export?format=md\|txt` | download; copia anche in `Exports/` |
-| POST | `/meetings/{id}/reprocess` | `{steps:["transcribe","summarize"]}` |
+| POST | `/meetings/{id}/reprocess` | rimette in coda l'elaborazione |
 | POST | `/meetings/{id}/open-folder` | apre la cartella nel Finder |
 | POST | `/open-data-root` | apre `~/MeetLocalAI` nel Finder |
 
@@ -120,7 +121,7 @@ Nessun endpoint di cancellazione nella v1 (le riunioni si eliminano dal Finder).
 Errori: `{error_code, user_message, detail_logged:true}`. Messaggi utente fissi: "Backend offline.", "Whisper locale non disponibile.", "Modello locale non disponibile."; dettagli tecnici solo nei log.
 
 ## 5. Pipeline di elaborazione
-Stati: `recording → stopped → converting → transcribing → summarizing → completed` · `error` (con `error.step`) · `interrupted` (backend riavviato durante la registrazione; l'audio ricevuto resta recuperabile con reprocess).
+Stati: `recording → stopped → converting → transcribing → transcribed → summarizing → completed` · `error` (con `error.step`) · `interrupted` (backend riavviato durante la registrazione; l'audio ricevuto resta recuperabile con reprocess).
 1. **converting** — FFmpeg: `raw/*.webm` → WAV 16 kHz mono per traccia + `audio.wav` mix.
 2. **transcribing** — Whisper su ciascuna traccia; unione per timestamp. Etichette: traccia mic → "Microfono locale", traccia scheda → "Speaker 1..N" (o "Partecipanti" senza diarizzazione). Nessun nome inventato.
 3. **summarizing** — Ollama, prompt vincolato al formato del brief; trascrizioni lunghe → sintesi a blocchi + unione. Sezioni non determinabili → "Non chiaramente determinabile dalla trascrizione."

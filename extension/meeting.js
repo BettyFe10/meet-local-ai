@@ -1,4 +1,4 @@
-import { getMeeting } from "./lib/api.js";
+import { getMeeting, getTranscript, reprocessMeeting } from "./lib/api.js";
 import { el, fmtDate, fmtDuration, fmtTime, statusLabel } from "./lib/ui.js";
 
 const SECTIONS = ["TL;DR", "DECISIONI", "ACTION ITEMS", "PROBLEMI / CRITICITÀ", "DOMANDE APERTE", "PROSSIMI PASSI"];
@@ -24,6 +24,30 @@ async function load() {
     $("date").textContent = `${fmtDate(m.created_at)} ${fmtTime(m.created_at)}`;
     $("duration").textContent = fmtDuration(m.duration_seconds);
     $("status").textContent = statusLabel(m.status);
+    if (m.status === "error" && m.error) {
+      $("banner").replaceChildren(el("div", { class: "banner off" }, m.error.user_message || "Elaborazione non riuscita."));
+      $("btnReprocess").hidden = false;
+    }
+    if (m.files?.transcript_txt) {
+      $("btnTranscript").disabled = false;
+      $("btnTranscript").onclick = async () => {
+        const box = $("transcriptBox");
+        if (!box.hidden) { box.hidden = true; return; }
+        try {
+          $("transcript").textContent = await getTranscript(id, "txt");
+          box.hidden = false;
+        } catch (e) {
+          $("banner").replaceChildren(el("div", { class: "banner off" }, e.userMessage));
+        }
+      };
+    }
+    $("btnReprocess").onclick = async () => {
+      $("btnReprocess").disabled = true;
+      try { await reprocessMeeting(id); $("status").textContent = "In coda"; } catch (e) {
+        $("banner").replaceChildren(el("div", { class: "banner off" }, e.userMessage));
+      }
+    };
+    if (["stopped", "converting", "transcribing", "summarizing"].includes(m.status)) setTimeout(load, 5000);
   } catch (e) {
     $("banner").replaceChildren(el("div", { class: "banner off" }, e.userMessage));
   }

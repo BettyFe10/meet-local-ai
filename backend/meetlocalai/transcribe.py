@@ -75,13 +75,28 @@ class MlxEngine:
         return [Segment(float(s["start"]), float(s["end"]), s["text"].strip()) for s in r.get("segments", []) if s["text"].strip()]
 
 
+VAD_MODELS = ("ggml-silero-v6.2.0.bin", "ggml-silero-v5.1.2.bin")
+
+
 class WhisperCppEngine:
     name = "whispercpp"
 
-    def __init__(self, model: str, models_dir: Path, threads: int = 4):
+    def __init__(self, model: str, models_dir: Path, threads: int = 4, vad: bool = True):
         self.model = model if model and model != "auto" else DEFAULT_MODELS["whispercpp"]
         self.models_dir = models_dir
         self.threads = threads
+        self.vad = vad
+
+    def vad_model(self) -> Path | None:
+        """Modello Silero VAD (salta i silenzi). Facoltativo e DISATTIVATO di default (D-035):
+        più veloce, ma su whisper.cpp 1.9.4 accorpa frasi lontane e falsa i tempi → l'unione delle tracce peggiora."""
+        if not self.vad:
+            return None
+        for n in VAD_MODELS:
+            p = self.models_dir / "whispercpp" / n
+            if p.exists():
+                return p
+        return None
 
     def model_path(self) -> Path:
         return self.models_dir / "whispercpp" / f"ggml-{self.model}.bin"
@@ -101,6 +116,9 @@ class WhisperCppEngine:
             prefix = Path(td) / "out"
             cmd = [self.binary(), "-m", str(self.model_path()), "-f", str(wav), "-l", language or "auto",
                    "-t", str(self.threads), "-oj", "-of", str(prefix), "-np"]
+            vm = self.vad_model()
+            if vm:
+                cmd += ["--vad", "-vm", str(vm)]
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=6 * 3600)
             if r.returncode != 0:
                 log.error("whisper-cli fallito (%s): %s", r.returncode, r.stderr[-800:])
@@ -118,11 +136,11 @@ def parse_whispercpp_json(data: dict) -> list[Segment]:
     return out
 
 
-def make_engine(name: str, model: str, models_dir: Path):
+def make_engine(name: str, model: str, models_dir: Path, vad: bool = True):
     if name == "mlx":
         return MlxEngine(model, models_dir)
     if name == "whispercpp":
-        return WhisperCppEngine(model, models_dir)
+        return WhisperCppEngine(model, models_dir, vad=vad)
     raise ValueError(f"motore sconosciuto: {name}")
 
 
@@ -132,7 +150,7 @@ def select_engine(cfg: dict, models_dir: Path):
     name, model = tc.get("engine", "auto"), tc.get("model", "auto")
     names = ENGINE_ORDER if name == "auto" else (name,)
     for n in names:
-        eng = make_engine(n, model if name != "auto" else "auto", models_dir)
+        eng = make_engine(n, model if name != "auto" else "auto", models_dir, vad=tc.get("vad", False))
         ok, why = eng.available()
         if ok:
             return eng
@@ -149,9 +167,11 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--wav", required=True, type=Path)
     ap.add_argument("--out", required=True, type=Path)
     ap.add_argument("--language", default="it")
+    ap.add_argument("--no-vad", action="store_true")
     a = ap.parse_args(argv)
     cfg = config_mod.load()
-    eng = make_engine(a.engine, a.model, config_mod.data_dirs(cfg)["models_dir"])
+    eng = make_engine(a.engine, a.model, config_mod.data_dirs(cfg)["models_dir"],
+                      vad=not a.no_vad and cfg["transcription"].get("vad", False))
     ok, why = eng.available()
     if not ok:
         print(f"Motore non disponibile: {why}", file=sys.stderr)

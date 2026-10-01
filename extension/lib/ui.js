@@ -15,6 +15,7 @@ export const STATUS_LABELS = {
   stopped: "In coda",
   converting: "Conversione audio…",
   transcribing: "Trascrizione…",
+  transcribed: "✓ Trascritta",
   summarizing: "Sintesi…",
   completed: "✓ Completata",
   error: "Errore",

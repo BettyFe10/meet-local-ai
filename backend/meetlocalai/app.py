@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from . import __version__, health, meetings, messages, recording
+from . import __version__, health, meetings, messages, processing, recording
 from . import config as config_mod
 from . import logging_setup
 from .security import SecurityPolicy
@@ -71,6 +71,13 @@ def create_app(cfg: dict | None = None) -> FastAPI:
     recorder = recording.Recorder(cfg, meetings_dir)
     recorder.recover()
     app.state.recorder = recorder
+    processor = processing.Processor(cfg, config_mod.data_dirs(cfg), recorder.lock)
+    app.state.processor = processor
+    if cfg.get("processing", {}).get("enabled", True):
+        pending = processor.recover()
+        if pending:
+            log.info("Riunioni da elaborare rimesse in coda: %d", len(pending))
+        processor.start_worker()
 
     @app.exception_handler(recording.RecordingError)
     async def _rec_exc(request: Request, exc: recording.RecordingError):
@@ -85,8 +92,8 @@ def create_app(cfg: dict | None = None) -> FastAPI:
         return {
             "time": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
             "recording": recorder.status(),
-            "processing": None,  # Fase 8
-            "queue_length": 0,
+            "processing": processor.status()["current"],
+            "queue_length": processor.status()["queue_length"],
         }
 
     @app.post("/api/v1/meetings", status_code=201)
@@ -106,9 +113,37 @@ def create_app(cfg: dict | None = None) -> FastAPI:
     def post_stop(meeting_id: str, payload: dict = Body(default={})):
         cd = payload.get("client_duration_seconds")
         try:
-            return recorder.stop(meeting_id, float(cd) if isinstance(cd, (int, float)) else None)
+            md = recorder.stop(meeting_id, float(cd) if isinstance(cd, (int, float)) else None)
         except meetings.MeetingNotFound:
             return _not_found()
+        if md.get("status") == "stopped":
+            processor.enqueue(meeting_id)
+        return md
+
+    @app.post("/api/v1/meetings/{meeting_id}/reprocess")
+    def post_reprocess(meeting_id: str):
+        try:
+            md = meetings.get_meeting(meetings_dir, meeting_id)
+        except meetings.MeetingNotFound:
+            return _not_found()
+        if md.get("status") in ("recording", "interrupted"):
+            raise recording.RecordingError(409, "still_recording", "La registrazione è ancora attiva.")
+        queued = processor.enqueue(meeting_id)
+        return {"queued": queued, "queue_length": processor.status()["queue_length"]}
+
+    @app.get("/api/v1/meetings/{meeting_id}/transcript")
+    def get_transcript(meeting_id: str, format: str = Query("txt", pattern="^(txt|md)$")):
+        from fastapi.responses import PlainTextResponse  # noqa: PLC0415
+        try:
+            md = meetings.get_meeting(meetings_dir, meeting_id)
+        except meetings.MeetingNotFound:
+            return _not_found()
+        f = meetings_dir / md["id"] / f"transcript.{format}"
+        if not f.exists():
+            return JSONResponse(status_code=404, content={"error_code": "transcript_not_ready",
+                                                          "user_message": "Trascrizione non ancora disponibile.", "detail_logged": False})
+        return PlainTextResponse(f.read_text(encoding="utf-8"),
+                                 media_type="text/markdown; charset=utf-8" if format == "md" else "text/plain; charset=utf-8")
 
     @app.patch("/api/v1/meetings/{meeting_id}")
     def patch_meeting(meeting_id: str, payload: dict = Body(...)):

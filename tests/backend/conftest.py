@@ -20,6 +20,8 @@ def write_cfg(tmp_path: Path, override: dict | None = None) -> Path:
             "logs_dir": "Logs", "exports_dir": "Exports", "temp_dir": "Temp"}.items()},
         # porta chiusa: Ollama risulta non raggiungibile in modo deterministico
         "llm": {"base_url": "http://127.0.0.1:9"},
+        # nei test l'elaborazione si lancia a mano (niente thread in background)
+        "processing": {"enabled": False},
     }
     if override:
         cfg = config_mod._deep_merge(cfg, override)

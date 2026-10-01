@@ -73,17 +73,26 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [x] Scaricare solo il modello scelto in ~/MeetLocalAI/Models
 - [x] Integrare nel backend + health "Whisper disponibile"
 
-- [ ] (U) Ricreare il venv senza mlx/torch (vedi PROJECT_STATUS)
+- [x] (U) Ricreare il venv senza mlx/torch
 
-## FASE 8 — Trascrizione completa (PROSSIMA)
-- [ ] Pipeline automatica dopo TERMINA: converting → transcribing (coda FIFO, una alla volta)
-- [ ] Trascrizione per traccia e unione per timestamp; etichette "Microfono locale" / "Partecipanti" (D-015), nessun nome inventato
-- [ ] transcript.txt + transcript.md con [hh:mm:ss]; metadata (motore, modello, tempi, RTF)
-- [ ] Ottimizzare velocità su audio lunghi (beam size, thread, flash attention) e misurare su ≥10 min
-- [ ] Filtrare allucinazioni tipiche su silenzio; pulizia WAV temporanei
-- [ ] Riprocessare riunioni già registrate (endpoint reprocess)
+## FASE 8 — Trascrizione completa ✅
+- [x] Pipeline automatica dopo TERMINA: converting → transcribing (coda FIFO, una alla volta)
+- [x] Trascrizione per traccia e unione per timestamp; etichette "Microfono locale" / "Partecipanti" (D-015), nessun nome inventato
+- [x] transcript.txt + transcript.md con [hh:mm:ss]; metadata (motore, modello, tempi, RTF)
+- [x] Misurare velocità su ≥10 min (RTF ~0,06–0,11; 1 h ≈ 10 min)
+- [ ] Ottimizzazioni facoltative: beam size, VAD con parametri diversi (tempi più fini) — solo se servirà
+- [x] Filtrare allucinazioni tipiche su silenzio; pulizia WAV temporanei
+- [x] Riprocessare riunioni già registrate (endpoint reprocess)
 
-## FASE 9–16
+- [ ] (U) Confermare che dopo il ritorno a "senza VAD" la trascrizione di RIUNIONE-DI-TEST è tornata come prima
+- [ ] Avviso in tempo reale durante la registrazione se la traccia della riunione resta muta (oggi solo a posteriori)
+
+## FASE 9 — LLM locale (PROSSIMA)
+- [ ] Ricerca modelli multilingue/italiano 7–9B con licenza permissiva compatibili con 16 GB
+- [ ] (U) Installare Ollama e scaricare il modello scelto (keep_alive breve)
+- [ ] Benchmark su una trascrizione reale: tempo, RAM, qualità in italiano, rispetto del formato
+
+## FASE 10–16
 - [ ] Vedi ordine fasi nel brief (Trascrizione completa → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
 
 ## Installazioni previste (NON ancora eseguite)

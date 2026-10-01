@@ -106,6 +106,20 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Riepilogo benchmark senza testo delle riunioni nei log | VM + Mac | SUPERATO | solo numeri in Logs/ |
 | Velocità su riunioni lunghe (≥10 min) | — | NON TESTATA | Fase 8 |
 
+## Fase 8 — 2026-10-01
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (98 test) | VM Linux | SUPERATO | pipeline end-to-end con ffmpeg reale e whisper-cli finto; worker automatico + recupero al riavvio |
+| Elaborazione automatica al riavvio delle 4 riunioni in coda | Mac | SUPERATO | 2 senza audio → errore "Nessun audio registrato…"; 2 → trascritte |
+| RIUNIONE-DI-TEST (69 s) elaborata | Mac | SUPERATO | conversione 0,24 s, trascrizione 11,6 s (RTF 0,17 incl. caricamento modello), RAM ~1,9 GB |
+| Trascrizione leggibile | Mac | SUPERATO | giudizio utente: "non perfetta ma leggibile" |
+| Traccia muta saltata con avviso (riunione 19-25) | Mac | SUPERATO | picco -91 dB, nessuna frase inventata |
+| Allucinazione "Autore dei sottotitoli… QTSS" | Mac | CORRETTO | comparsa nella prima elaborazione, ora filtrata |
+| Velocità 10 min/traccia, senza VAD | Mac M4 | MISURATO | scheda 36,5 s (RTF 0,059), mic 69,1 s (RTF 0,112) → 1 h ≈ 10 min |
+| Velocità 10 min/traccia, con VAD | Mac M4 | MISURATO | scheda 31,1 s (RTF 0,050), mic 16,2 s (RTF 0,026) |
+| Qualità con VAD | Mac | PEGGIORE | frasi lontane accorpate, tempi spostati → ordine tra tracce errato; utente: "andava meglio prima" → VAD disattivato |
+| Trascrizione dopo ritorno a senza VAD | — | NON TESTATA | richiede riavvio + rielabora |
+
 ## Benchmark
 ### Whisper — 2026-10-01, Mac mini M4 16 GB, riunione di test 68,6 s (tracce: scheda + microfono), modello large-v3-turbo
 | Motore | Traccia | Tempo | Rapporto realtime | RAM max* | Segmenti / caratteri |

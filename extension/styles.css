@@ -55,3 +55,4 @@ input[type=text] { width: 100%; padding: 8px 10px; border-radius: 6px; border: 1
                    background: var(--panel); color: var(--text); font-size: 13px; }
 [hidden] { display: none !important; }
 label input[type=checkbox] { margin-right: 6px; }
+.transcript { white-space: pre-wrap; font-family: inherit; font-size: 14px; line-height: 1.55; margin: 0; max-height: 70vh; overflow: auto; }

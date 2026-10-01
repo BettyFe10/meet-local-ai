@@ -21,7 +21,8 @@ def make_webm(path: Path, seconds: float, freq: int = 440, silent: bool = False)
 
 
 FAKE_WHISPER_CLI = """#!/bin/bash
-# finto whisper-cli: scrive un JSON nel formato di whisper.cpp
+# finto whisper-cli: scrive un JSON nel formato di whisper.cpp e registra gli argomenti ricevuti
+echo "$@" > "$(dirname "$0")/last_args.txt"
 while [ $# -gt 0 ]; do case "$1" in -of) OF="$2"; shift;; -m) M="$2"; shift;; esac; shift; done
 [ -f "$M" ] || { echo "model missing" >&2; exit 1; }
 cat > "$OF.json" <<JSON
@@ -159,3 +160,44 @@ def test_bench_end_to_end_with_fake_engine(fake_whispercpp, tmp_path, capsys, mo
     assert summary["engines"]["mlx"]["available"] is False
     assert "Buongiorno" not in json.dumps(summary)          # nessun testo nei log
     assert "Buongiorno" in (dirs["temp_dir"] / "bench" / meeting.name / "whispercpp_tab.txt").read_text()
+
+
+@needs_ffmpeg
+def test_bench_repeat_makes_longer_audio(fake_whispercpp, monkeypatch):
+    dirs = config_mod.data_dirs(config_mod.load())
+    meeting = dirs["meetings_dir"] / "2026-10-01_10-00_Lungo"
+    make_webm(meeting / "raw" / "tab.webm", 5.0)
+    monkeypatch.setenv("PATH", f"{fake_whispercpp.parent}:{__import__('os').environ['PATH']}")
+    assert bench.main(["--meeting", meeting.name, "--engines", "whispercpp", "--repeat", "3"]) == 0
+    s = json.loads(sorted(dirs["logs_dir"].glob("whisper_benchmark_*.json"))[-1].read_text())
+    assert s["repeat"] == 3 and 14.5 < s["audio_seconds"] < 15.5
+
+
+
+def test_whispercpp_uses_vad_when_enabled_and_model_present(fake_whispercpp, tmp_path):
+    cfg = config_mod.load()
+    assert cfg["transcription"]["vad"] is False          # default: disattivato (D-035)
+    cfg["transcription"]["vad"] = True
+    models = config_mod.data_dirs(cfg)["models_dir"]
+    wav = tmp_path / "x.wav"
+    wav.write_bytes(b"")
+    eng = transcribe.select_engine(cfg, models)
+    eng.transcribe(wav, "it")
+    assert "--vad" not in (fake_whispercpp.parent / "last_args.txt").read_text()
+    (models / "whispercpp" / "ggml-silero-v6.2.0.bin").write_bytes(b"v")
+    eng.transcribe(wav, "it")
+    args = (fake_whispercpp.parent / "last_args.txt").read_text()
+    assert "--vad" in args and "ggml-silero-v6.2.0.bin" in args
+    transcribe.make_engine("whispercpp", "auto", models, vad=False).transcribe(wav, "it")
+    assert "--vad" not in (fake_whispercpp.parent / "last_args.txt").read_text()
+
+
+@needs_ffmpeg
+def test_peak_db_detects_silence(tmp_path):
+    s, t = tmp_path / "s.webm", tmp_path / "t.webm"
+    make_webm(s, 1.0, silent=True)
+    make_webm(t, 1.0)
+    audio.to_wav(s, tmp_path / "s.wav")
+    audio.to_wav(t, tmp_path / "t.wav")
+    assert audio.peak_db(tmp_path / "s.wav") < -60
+    assert audio.peak_db(tmp_path / "t.wav") > -20

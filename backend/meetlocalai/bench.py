@@ -45,9 +45,9 @@ def fmt_ts(sec: float) -> str:
     return f"{s // 3600:02d}:{s % 3600 // 60:02d}:{s % 60:02d}"
 
 
-def run_one(engine: str, wav: Path, out_json: Path, language: str) -> dict:
+def run_one(engine: str, wav: Path, out_json: Path, language: str, vad: bool = True) -> dict:
     cmd = [sys.executable, "-m", "meetlocalai.transcribe", "--engine", engine, "--wav", str(wav), "--out", str(out_json),
-           "--language", language]
+           "--language", language] + ([] if vad else ["--no-vad"])
     if sys.platform == "darwin":
         cmd = ["/usr/bin/time", "-l"] + cmd
     t0 = time.perf_counter()
@@ -66,6 +66,8 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(prog="python -m meetlocalai.bench")
     ap.add_argument("--meeting")
     ap.add_argument("--engines", default="mlx,whispercpp")
+    ap.add_argument("--no-vad", action="store_true", help="disattiva il VAD di whisper.cpp")
+    ap.add_argument("--repeat", type=int, default=1, help="ripete l'audio N volte per misurare la velocità su durate lunghe")
     a = ap.parse_args(argv)
 
     cfg = config_mod.load()
@@ -77,9 +79,16 @@ def main(argv: list[str]) -> int:
     t0 = time.perf_counter()
     prep = audio.prepare(folder, ["tab", "mic"], work)
     conv = time.perf_counter() - t0
+    if a.repeat > 1:
+        for track, wav in list(prep["tracks"].items()):
+            longer = wav.with_name(f"{track}_x{a.repeat}.wav")
+            audio._run([audio._ffmpeg(), "-nostdin", "-y", "-v", "error", "-stream_loop", str(a.repeat - 1),
+                        "-i", str(wav), "-c", "copy", str(longer)])
+            prep["tracks"][track] = longer
+        prep["duration"] = max(audio.wav_duration(w) for w in prep["tracks"].values())
     print(f"Conversione: {conv:.1f} s, durata audio {prep['duration']:.1f} s, tracce {list(prep['tracks'])}")
 
-    results = {"meeting": folder.name, "date": datetime.now().astimezone().isoformat(timespec="seconds"),
+    results = {"meeting": folder.name, "repeat": a.repeat, "vad": not a.no_vad, "date": datetime.now().astimezone().isoformat(timespec="seconds"),
                "machine": {"platform": platform.platform(), "machine": platform.machine(), "python": platform.python_version()},
                "audio_seconds": round(prep["duration"], 1), "conversion_seconds": round(conv, 2), "engines": {}}
     for name in [e.strip() for e in a.engines.split(",") if e.strip()]:
@@ -92,7 +101,7 @@ def main(argv: list[str]) -> int:
         er = {"available": True, "model": eng.model, "tracks": {}}
         for track, wav in prep["tracks"].items():
             out_json = work / f"{name}_{track}.json"
-            r = run_one(name, wav, out_json, language)
+            r = run_one(name, wav, out_json, language, vad=not a.no_vad)
             dur = audio.wav_duration(wav)
             if r["ok"]:
                 segs = json.loads(out_json.read_text(encoding="utf-8"))["segments"]

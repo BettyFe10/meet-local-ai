@@ -13,7 +13,7 @@ export class BackendError extends Error {
 }
 
 export function makeClient(getBaseUrl, fetchImpl = (...a) => fetch(...a)) {
-  async function request(path, { method = "GET", body, rawBody, contentType, timeoutMs = 4000 } = {}) {
+  async function request(path, { method = "GET", body, rawBody, contentType, timeoutMs = 4000, as = "json" } = {}) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeoutMs);
     let res;
@@ -35,6 +35,7 @@ export function makeClient(getBaseUrl, fetchImpl = (...a) => fetch(...a)) {
     } finally {
       clearTimeout(timer);
     }
+    if (res.ok && as === "text") return res.text();
     let data = null;
     try { data = await res.json(); } catch { /* risposta non JSON */ }
     if (!res.ok) {
@@ -54,6 +55,8 @@ export function makeClient(getBaseUrl, fetchImpl = (...a) => fetch(...a)) {
     startMeeting: (payload) => request("/meetings", { method: "POST", body: payload, timeoutMs: 8000 }),
     stopMeeting: (id, clientDurationSeconds) =>
       request(`/meetings/${enc(id)}/stop`, { method: "POST", body: { client_duration_seconds: clientDurationSeconds }, timeoutMs: 8000 }),
+    getTranscript: (id, format = "txt") => request(`/meetings/${enc(id)}/transcript?format=${format}`, { as: "text", timeoutMs: 10000 }),
+    reprocessMeeting: (id) => request(`/meetings/${enc(id)}/reprocess`, { method: "POST" }),
     renameMeeting: (id, title) => request(`/meetings/${enc(id)}`, { method: "PATCH", body: { title } }),
     sendChunk: (id, track, seq, blob) =>
       request(`/meetings/${enc(id)}/chunks?track=${enc(track)}&seq=${seq}`,

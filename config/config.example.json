@@ -29,7 +29,8 @@
     "language": "it",
     "detect_language": false,
     "timestamps": true,
-    "diarization": "channels"
+    "diarization": "channels",
+    "vad": false
   },
   "llm": {
     "provider": "ollama",
@@ -58,5 +59,8 @@
     "max_bytes": 5242880,
     "backup_count": 5,
     "log_transcript_content": false
+  },
+  "processing": {
+    "enabled": true
   }
 }

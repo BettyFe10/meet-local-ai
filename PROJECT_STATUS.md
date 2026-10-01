@@ -1,8 +1,18 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-01
-**Fase corrente:** FASE 7 — Whisper locale → ✅ COMPLETATA (benchmark sul Mac, motore scelto: whisper.cpp)
-**Prossima fase:** FASE 8 — Trascrizione completa (NON ANCORA INIZIATA)
+**Fase corrente:** FASE 8 — Trascrizione completa → ✅ COMPLETATA (verificata sul Mac; in attesa solo della conferma visiva dopo il ritorno a "senza VAD")
+**Prossima fase:** FASE 9 — LLM locale (NON ANCORA INIZIATA)
+
+## Fase 8 — cosa è stato fatto
+- `processing.py`: dopo TERMINA la riunione entra in una coda FIFO (thread dedicato, una alla volta): `converting` → `transcribing` → **`transcribed`** (nuovo stato; `completed` arriverà con la sintesi in Fase 10). Riunioni rimaste a metà vengono rimesse in coda al riavvio. Errori → `error` con passo e messaggio per l'utente.
+- Trascrizione per traccia, unione in ordine di tempo con etichette **"Microfono locale"** / **"Partecipanti"** (nessun nome dedotto), frasi consecutive dello stesso speaker accorpate (≤2 s).
+- File: `audio.wav` (mix), `transcript.txt`, `transcript.md`, `transcript.json`; WAV temporanei cancellati. Metadata: motore/modello, tempi, RTF, RAM, spazio disco, avvisi.
+- Filtri anti-"allucinazioni": firme di sottotitolatori (QTSS, Amara…), frasi ripetute in loop (max 2 consecutive), **tracce mute saltate** con avviso (picco < -60 dB).
+- VAD Silero provato: 2–4× più veloce ma su whisper.cpp 1.9.4 accorpa frasi lontane e sposta i tempi → unione delle tracce peggiore (confermato dall'utente). **Disattivato di default** (`transcription.vad=false`, D-035); modello VAD scaricato ma non usato.
+- API: `POST /meetings/{id}/reprocess`, `GET /meetings/{id}/transcript?format=txt|md`, `/status` con elaborazione corrente e coda.
+- Estensione: stato "✓ Trascritta", pulsante **Trascrizione** nella pagina riunione, motivo dell'errore + **Rielabora**, aggiornamento automatico durante l'elaborazione.
+- Test: 98.
 
 ## Fase 7 — cosa è stato fatto
 - Backend: `audio.py` (FFmpeg: webm → WAV 16 kHz mono, mix delle tracce → `audio.wav`), `transcribe.py` (motori `whispercpp` e `mlx`, trascrizione senza rete: HF_HUB_OFFLINE), `bench.py` (tempo, RTF, RAM con `/usr/bin/time -l`), health "Whisper" reale.
@@ -118,10 +128,9 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 4. Le mie azioni sul Mac passano da una VM che vede solo `~/MeetLocalAI`: installazioni di sistema (brew, Ollama) e il caricamento dell'estensione in Chrome richiederanno che l'utente esegua comandi/script forniti.
 
 ## Operazioni che richiedono intervento dell'utente
-- Se non ancora fatto: ricreare l'ambiente Python senza i pacchetti MLX: `cd ~/MeetLocalAI/app && ./stop_backend.sh && rm -rf backend/.venv && bash installer/setup_backend.sh && ./start_backend.sh`
 - (Opzionale, quando vuoi) Pubblicare su GitHub privato seguendo `docs/GITHUB.md` (creare repo + `git push`).
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 8.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 9.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).

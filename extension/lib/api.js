@@ -16,4 +16,5 @@ export async function baseUrl() {
 const client = makeClient(baseUrl);
 export const {
   request, getHealth, listMeetings, getMeeting, getStatus, startMeeting, stopMeeting, renameMeeting, sendChunk,
+  getTranscript, reprocessMeeting,
 } = client;

@@ -79,3 +79,14 @@ def prepare(meeting_folder: Path, tracks: list[str], work_dir: Path, sample_rate
     audio = meeting_folder / "audio.wav"
     duration = mix(list(out.values()), audio)
     return {"tracks": out, "audio": audio, "duration": duration}
+
+
+def peak_db(wav: Path) -> float | None:
+    """Picco del segnale in dB (FFmpeg volumedetect). None se non misurabile."""
+    import re  # noqa: PLC0415
+    r = subprocess.run([_ffmpeg(), "-nostdin", "-hide_banner", "-nostats", "-i", str(wav), "-af", "volumedetect",
+                        "-f", "null", "-"], capture_output=True, text=True, timeout=600)
+    m = re.search(r"max_volume:\s*(-?[\d.]+|-inf) dB", r.stderr)
+    if not m:
+        return None
+    return -120.0 if m.group(1) == "-inf" else float(m.group(1))

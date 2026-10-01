@@ -28,4 +28,11 @@ else
   mv "$GG.part" "$GG"
 fi
 ls -lh "$GG" | awk '{print "Modello:", $5, $9}'
+
+# Modello VAD (Silero, ~1 MB): salta i silenzi → trascrizione più veloce e meno frasi inventate
+VAD="$MODELS/ggml-silero-v6.2.0.bin"
+if [ -s "$VAD" ]; then echo "Modello VAD già presente"; else
+  curl -L --fail -o "$VAD.part" "https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-silero-v6.2.0.bin" && mv "$VAD.part" "$VAD"
+fi
+ls -lh "$VAD" | awk '{print "VAD:", $5, $9}'
 echo "Trascrizione locale pronta (whisper.cpp, $MODEL)."
