@@ -54,16 +54,27 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 ## Dopo la Fase 5 ✅
 - [x] Avvio automatico backend con LaunchAgent (D-024): install/uninstall reversibili, start/stop_backend.sh compatibili
 
-## FASE 6 — Cattura audio (PROSSIMA)
+## FASE 6 — Cattura audio ✅
 - [ ] (U) Verificare che dopo un riavvio/login del Mac il popup mostri PRONTO senza Terminale
-- [ ] Permessi tabCapture + offscreen; offscreen document con MediaRecorder (webm/opus, 5 s) + ChunkUploader
-- [ ] Riproduzione dell'audio della scheda all'utente (tabCapture la silenzia)
-- [ ] Microfono come traccia separata (permesso da settings.html), fallback solo scheda
-- [ ] Stop: flush della coda prima di chiudere la riunione
-- [ ] (U) Test con una vera chiamata Meet
+- [x] Permessi tabCapture + offscreen; offscreen document con MediaRecorder (webm/opus, 5 s) + ChunkUploader
+- [x] Riproduzione dell'audio della scheda all'utente (tabCapture la silenzia)
+- [x] Microfono come traccia separata (permesso da settings.html), fallback solo scheda
+- [x] Stop: flush della coda prima di chiudere la riunione
+- [x] (U) Test con una vera chiamata Meet
 
-## FASE 6–16
-- [ ] Vedi ordine fasi nel brief (Audio → Whisper → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
+- [ ] Chiarire la prima prova con traccia scheda muta (2026-10-01_19-25)
+- [ ] Rilevare automaticamente una traccia della scheda completamente muta e avvisare l'utente durante la registrazione
+- [ ] Backend offline durante una registrazione reale (coda) — NON TESTATA in Chrome
+
+## FASE 7 — Whisper locale (PROSSIMA)
+- [ ] (U) Installare FFmpeg (`brew install ffmpeg`)
+- [ ] Conversione raw/*.webm → WAV 16 kHz mono per traccia + audio.wav mix
+- [ ] Benchmark mlx-whisper vs whisper.cpp (large-v3-turbo; fallback small/medium) su audio italiano: velocità, RAM, qualità
+- [ ] Scaricare solo il modello scelto in ~/MeetLocalAI/Models
+- [ ] Integrare nel backend + health "Whisper disponibile"
+
+## FASE 8–16
+- [ ] Vedi ordine fasi nel brief (Trascrizione completa → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
 
 ## Installazioni previste (NON ancora eseguite)
 - [ ] (U) `brew install ffmpeg` — Fase 6/7

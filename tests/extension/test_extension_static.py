@@ -14,7 +14,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[2]
 EXT = REPO / "extension"
 MANIFEST = json.loads((EXT / "manifest.json").read_text(encoding="utf-8"))
-PAGES = ["popup.html", "dashboard.html", "meeting.html", "settings.html"]
+PAGES = ["popup.html", "dashboard.html", "meeting.html", "settings.html", "offscreen.html"]
 
 
 def ext_id_from_key(key_b64: str) -> str:
@@ -29,7 +29,7 @@ def test_manifest_v3_basics():
 
 
 def test_permissions_are_minimal():
-    assert set(MANIFEST["permissions"]) <= {"storage", "tabCapture", "offscreen"}
+    assert set(MANIFEST["permissions"]) == {"storage", "tabCapture", "offscreen"}
     assert set(MANIFEST["host_permissions"]) == {"https://meet.google.com/*", "http://127.0.0.1/*"}
 
 
@@ -90,7 +90,8 @@ def test_no_remote_endpoints_in_js():
 
 
 def test_api_client_always_sends_client_header():
-    assert '"X-MeetLocalAI": "1"' in (EXT / "lib" / "api.js").read_text(encoding="utf-8")
+    assert '"X-MeetLocalAI": "1"' in (EXT / "lib" / "http.js").read_text(encoding="utf-8")
+    assert "makeClient" in (EXT / "lib" / "api.js").read_text(encoding="utf-8")
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node non installato")
@@ -100,3 +101,11 @@ def test_js_syntax(tmp_path):
         copy.write_text(js.read_text(encoding="utf-8"), encoding="utf-8")
         r = subprocess.run(["node", "--check", str(copy)], capture_output=True, text=True)
         assert r.returncode == 0, f"{js.name}: {r.stderr}"
+
+
+def test_offscreen_uses_only_runtime_api():
+    """L'offscreen document può usare solo chrome.runtime: niente storage/tabs/action."""
+    for f in [EXT / "offscreen.js", EXT / "lib" / "session.js", EXT / "lib" / "http.js", EXT / "lib" / "uploader.js"]:
+        txt = f.read_text(encoding="utf-8")
+        for api in re.findall(r"chrome\.([a-zA-Z]+)", txt):
+            assert api == "runtime", f"{f.name} usa chrome.{api}"

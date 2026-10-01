@@ -54,3 +54,4 @@ input[type=number] { padding: 8px; border-radius: 6px; border: 1px solid var(--b
 input[type=text] { width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border);
                    background: var(--panel); color: var(--text); font-size: 13px; }
 [hidden] { display: none !important; }
+label input[type=checkbox] { margin-right: 6px; }

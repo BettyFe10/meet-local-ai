@@ -83,5 +83,18 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | uninstall | — | NON TESTATA | |
 | Suite completa | VM Linux | SUPERATO | 68 test |
 
+## Fase 6 — 2026-10-01
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (71 pytest; 31 test JS in 4 suite Node) | VM Linux | SUPERATO | session.test.mjs con MediaRecorder/AudioContext finti |
+| Offscreen/session/http usano solo chrome.runtime | statico | SUPERATO | |
+| Chiamata Meet reale (Mac + telefono), tracce tab+mic, 69 s | Mac + Chrome 153 | SUPERATO | tab.webm 556 KB, mic.webm 555 KB, 14 blocchi/traccia, ~68,5 s decodificati senza errori |
+| Livelli audio registrazione reale | ffmpeg (VM, file locali) | SUPERATO | tab: media -21,2 dB; mic: media -29,8 dB; clipping trascurabile (0,03% / 0,001%) |
+| Separazione tracce / eco del telefono nel microfono | analisi inviluppi | SUPERATO | attività tab 55%, mic 25%, sovrapposte 6%; correlazione inviluppi ≈ 0 |
+| Audio della riunione udibile dall'utente durante la cattura | Mac | SUPERATO | nessun problema segnalato dall'utente |
+| Prima prova (19-25): traccia scheda | Mac | ANOMALIA | silenzio digitale -91 dB per 57 s (mic con audio): causa da chiarire |
+| Microfono negato → solo scheda con avviso | Node (fake) | SUPERATO | non provato in Chrome reale |
+| Fine cattura / chiusura scheda durante registrazione reale | — | NON TESTATA | coperta da test unitari |
+
 ## Benchmark
 Nessun benchmark ancora eseguito (previsto in Fase 7 per Whisper e Fase 9 per LLM).

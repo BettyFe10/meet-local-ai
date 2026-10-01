@@ -1,8 +1,18 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-01
-**Fase corrente:** FASE 5 ✅ + Avvio automatico backend ✅ (installato e verificato sul Mac)
-**Prossima fase:** FASE 6 — Cattura audio (NON ANCORA INIZIATA)
+**Fase corrente:** FASE 6 — Cattura audio → ✅ COMPLETATA (chiamata Meet reale registrata sul Mac)
+**Prossima fase:** FASE 7 — Whisper locale (NON ANCORA INIZIATA)
+
+## Fase 6 — cosa è stato fatto
+- Permessi estensione: `storage`, `tabCapture`, `offscreen`.
+- Popup: ottiene lo streamId della scheda Meet (`tabCapture.getMediaStreamId`, richiede il clic dell'utente) e sceglie le tracce (`tab` + `mic` se il microfono è abilitato e attivo nelle Impostazioni).
+- Offscreen document (`offscreen.html/js` + `lib/session.js`): cattura scheda (riprodotta all'utente via AudioContext), microfono separato (echoCancellation/noiseSuppression), MediaRecorder webm/opus 64 kbps a blocchi di 5 s, invio diretto al backend con `ChunkUploader`; allo stop svuota la coda (max 30 s) e rilascia tutto. Usa solo `chrome.runtime` (client HTTP `lib/http.js` senza chrome.storage).
+- Service worker: crea/chiude l'offscreen document; eventi (fine cattura → stop, upload offline → avviso). Se la cattura fallisce la riunione viene chiusa e l'errore mostrato. Dopo riavvio del browser con registrazione "orfana" → chiusa con avviso.
+- Impostazioni: "Abilita microfono" (permesso dato una volta all'origine dell'estensione) e interruttore "Registra anche il mio microfono".
+- Test: 71 pytest (di cui 4 suite Node con 31 test JS: controller, session, uploader, ui).
+- Prova reale (2026-10-01_19-27_RIUNIONE-DI-TEST, 69 s): tab.webm e mic.webm validi (opus 48 kHz; scheda stereo, mic mono), 14 blocchi ciascuno, nessun errore di decodifica. Tracce ben separate (attività sovrapposta 6%, correlazione ~0 → nessuna eco del telefono nel microfono).
+- Problema aperto: nella prima prova (2026-10-01_19-25_Riunione-wew-hpms-fnn) la traccia della scheda è silenzio digitale (-91 dB) mentre il microfono ha audio → causa da chiarire con l'utente (telefono non ancora in chiamata? scheda silenziata?).
 
 ## Avvio automatico (LaunchAgent) — cosa è stato fatto
 - `installer/launchagent.sh install|uninstall|status|print-plist` → `~/Library/LaunchAgents/local.meetlocalai.backend.plist` (label `local.meetlocalai.backend`).
@@ -103,5 +113,5 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 6.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 7.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).

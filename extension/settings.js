@@ -7,7 +7,30 @@ function show(text, ok) {
   $("result").className = `small status ${ok ? "ok" : "off"}`;
 }
 
+async function refreshMic() {
+  let state = "prompt";
+  try { state = (await navigator.permissions.query({ name: "microphone" })).state; } catch { /* non supportato */ }
+  const el = $("micStatus");
+  el.textContent = state === "granted" ? "Microfono abilitato." : state === "denied"
+    ? "Microfono bloccato: riabilitalo dalle impostazioni del sito dell'estensione in Chrome." : "Microfono non ancora abilitato.";
+  el.className = `small status ${state === "granted" ? "ok" : "off"}`;
+}
+
 async function init() {
+  const { captureMic } = await chrome.storage.local.get({ captureMic: true });
+  $("captureMic").checked = captureMic;
+  $("captureMic").addEventListener("change", () => chrome.storage.local.set({ captureMic: $("captureMic").checked }));
+  $("grantMic").addEventListener("click", async () => {
+    try {
+      const st = await navigator.mediaDevices.getUserMedia({ audio: true });
+      st.getTracks().forEach((t) => t.stop());   // serve solo a concedere il permesso
+    } catch (e) {
+      console.warn("[MeetLocalAI] permesso microfono:", e?.name);
+    }
+    refreshMic();
+  });
+  refreshMic();
+
   $("version").textContent = chrome.runtime.getManifest().version;
   $("extId").textContent = chrome.runtime.id;
   $("port").value = await getPort();

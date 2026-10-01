@@ -1,7 +1,8 @@
-// Service worker: orchestrazione dello stato di registrazione e badge "REC".
-// L'audio vero (tabCapture + offscreen) arriva in Fase 6.
+// Service worker: orchestrazione (stato, badge REC, offscreen document). Non tocca mai l'audio.
 import * as api from "./lib/api.js";
 import { createController, IDLE } from "./lib/controller.js";
+
+const OFFSCREEN_URL = "offscreen.html";
 
 const store = {
   get: async () => (await chrome.storage.session.get({ mla: IDLE })).mla,
@@ -20,23 +21,50 @@ const badge = {
   },
 };
 
-const controller = createController({ api, store, badge, log: (...a) => console.log("[MeetLocalAI]", ...a) });
+const toOffscreen = (msg) => chrome.runtime.sendMessage({ ...msg, target: "offscreen" });
+
+const capture = {
+  async start({ meetingId, streamId, tracks }) {
+    if (!(await chrome.offscreen.hasDocument())) {
+      await chrome.offscreen.createDocument({
+        url: OFFSCREEN_URL,
+        reasons: ["USER_MEDIA"],
+        justification: "Registrazione audio della riunione Google Meet avviata dall'utente.",
+      });
+    }
+    const { chunkSeconds } = await chrome.storage.local.get({ chunkSeconds: 5 });
+    return toOffscreen({ type: "start", meetingId, streamId, tracks, baseUrl: await api.baseUrl(), chunkMs: chunkSeconds * 1000 });
+  },
+  async stop() {
+    if (!(await chrome.offscreen.hasDocument())) return { ok: true, tracks: {} };
+    return toOffscreen({ type: "stop" });
+  },
+  async close() {
+    if (await chrome.offscreen.hasDocument()) await chrome.offscreen.closeDocument();
+  },
+  async isActive() {
+    if (!(await chrome.offscreen.hasDocument())) return false;
+    return !!(await toOffscreen({ type: "ping" }))?.active;
+  },
+};
+
+const controller = createController({ api, store, badge, capture, log: (...a) => console.log("[MeetLocalAI]", ...a) });
 
 chrome.runtime.onInstalled.addListener(() => controller.resync());
 chrome.runtime.onStartup.addListener(() => controller.resync());
 chrome.tabs.onRemoved.addListener((tabId) => { controller.onTabClosed(tabId); });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  // accetta messaggi solo dalle pagine di questa estensione
-  if (sender.id !== chrome.runtime.id) return false;
+  if (sender.id !== chrome.runtime.id || msg?.target === "offscreen") return false;
   const handlers = {
     getState: () => controller.getState(),
     start: () => controller.start(msg.payload || {}),
     stop: () => controller.stop(),
     resync: () => controller.resync(),
+    "offscreen-event": () => controller.onCaptureEvent(msg.event),
   };
   const h = handlers[msg?.type];
   if (!h) return false;
   h().then(sendResponse, (e) => sendResponse({ ok: false, error: e?.userMessage || "Errore interno dell'estensione." }));
-  return true; // risposta asincrona
+  return true;
 });

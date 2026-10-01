@@ -11,17 +11,19 @@
       <input id="title" type="text" maxlength="200" placeholder="Titolo riunione (facoltativo)">
     </div>
     <div class="row"><button id="start" class="btn primary" disabled>🔴 INIZIA RIUNIONE</button></div>
+    <div id="micHint" class="small muted" hidden>Microfono non abilitato: verrà registrato solo l'audio degli altri partecipanti. <a href="#" id="enableMic">Abilita</a></div>
   </section>
 
   <section id="viewRec" hidden>
     <div class="row"><span class="status rec">🔴 REGISTRAZIONE ATTIVA</span></div>
     <div id="recTitle" class="small muted"></div>
     <div class="row timer" id="timer">00:00:00</div>
-    <div class="small muted" id="recNote">Versione di prova: l'audio non viene ancora catturato (arriva nella prossima fase).</div>
+    <div class="small muted" id="recTracks"></div>
     <div class="row"><button id="stop" class="btn">■ TERMINA</button></div>
   </section>
 
   <div id="error" class="small status off"></div>
+  <div id="warning" class="small status wait"></div>
   <div id="saved" class="small" hidden>✓ Riunione salvata. <a href="#" id="openSaved">Apri</a></div>
 
   <div class="row"><button id="dashboard" class="btn">APRI DASHBOARD</button></div>

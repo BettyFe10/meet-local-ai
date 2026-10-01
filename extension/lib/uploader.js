@@ -12,6 +12,7 @@ export class ChunkUploader {
     this.sentChunks = 0;
     this.failures = 0;
     this.fatal = null;
+    this.cancelled = false;
     this._pumping = null;
   }
 
@@ -39,7 +40,7 @@ export class ChunkUploader {
   }
 
   async _run() {
-    while (this.queue.length && !this.fatal) {
+    while (this.queue.length && !this.fatal && !this.cancelled) {
       const item = this.queue[0];
       try {
         await this.send(this.meetingId, this.track, item.seq, item.blob);
@@ -70,6 +71,11 @@ export class ChunkUploader {
     const item = this.queue.shift();
     this.queuedBytes -= item.size;
     this.sentChunks += 1;
+  }
+
+  // Interrompe i ritentativi (es. dopo uno stop con backend irraggiungibile).
+  cancel() {
+    this.cancelled = true;
   }
 
   // Attende lo svuotamento della coda (per lo stop). Ritorna true se tutto è stato inviato.

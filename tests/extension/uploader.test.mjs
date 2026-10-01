@@ -64,3 +64,14 @@ test("coda oltre il limite (backend offline a lungo) → errore e blocchi rifiut
   assert.equal(up.enqueue(blob(10)), false);
   assert.match(up.fatal, /Backend offline/);
 });
+
+test("cancel interrompe i ritentativi", async () => {
+  let calls = 0;
+  const { up } = make(async () => { calls++; throw err(0, "backend_offline"); }, { sleep: (ms) => new Promise((r) => setTimeout(r, 1)) });
+  up.enqueue(blob(1));
+  await new Promise((r) => setTimeout(r, 20));
+  up.cancel();
+  const n = calls;
+  await new Promise((r) => setTimeout(r, 20));
+  assert.ok(calls <= n + 1);
+});

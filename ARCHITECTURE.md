@@ -73,6 +73,8 @@ PID del backend: `<temp_dir>/backend.pid` (scritto dal backend stesso); output d
 |---|---|
 | `manifest.json` | permessi attuali: `storage`; host: `https://meet.google.com/*`, `http://127.0.0.1/*`; dalla Fase 6 anche `tabCapture`, `offscreen`. `key` fissa → ID `lpdaoidkipjcdboiepcogiopcnhohiaa` su ogni computer |
 | `lib/api.js` | client HTTP verso il backend (header `X-MeetLocalAI`, timeout, "Backend offline.") |
+| `lib/http.js` | client HTTP puro (senza chrome.*), usato anche dall'offscreen |
+| `lib/session.js` | sessione di registrazione: tabCapture + microfono, MediaRecorder, playback, flush allo stop |
 | `lib/controller.js` | macchina a stati della registrazione (pura, testata con Node) |
 | `lib/uploader.js` | coda dei chunk audio verso il backend: ordine, ritentativi, limite memoria |
 | `lib/ui.js` | utilità DOM sicure (solo textContent), formattazione date/durate/stati, rilevamento codice Meet |
