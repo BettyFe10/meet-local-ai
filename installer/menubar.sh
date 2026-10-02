@@ -27,7 +27,15 @@ case "${1:-}" in
     BUILD="$(mktemp -d)"
     sed -e "s|__REPO__|$REPO|g" -e "s|__PORT__|$PORT|g" "$REPO/installer/menubar/main.swift" > "$BUILD/main.swift"
     echo "Compilo l'icona…"
-    "$SWIFTC" -O -o "$BUILD/MeetLocalAIBackend" "$BUILD/main.swift" -framework AppKit
+    SDK="$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)"
+    if [ -z "$SDK" ] || ! xcrun --sdk macosx swiftc -O -sdk "$SDK" -o "$BUILD/MeetLocalAIBackend" "$BUILD/main.swift" -framework AppKit; then
+      echo
+      echo "Compilazione non riuscita. Di solito gli strumenti da riga di comando di Apple sono vecchi rispetto a macOS."
+      echo "Aggiornali da Impostazioni di Sistema → Generali → Aggiornamento Software, oppure reinstallali con:"
+      echo "  sudo rm -rf /Library/Developer/CommandLineTools && xcode-select --install"
+      echo "Versione attuale: $(pkgutil --pkg-info=com.apple.pkg.CLTools_Executables 2>/dev/null | awk '/version/{print $2}') · SDK: ${SDK:-non trovato}"
+      exit 1
+    fi
     mkdir -p "$APP/Contents/MacOS"
     cp "$BUILD/MeetLocalAIBackend" "$APP/Contents/MacOS/MeetLocalAIBackend"
     cat > "$APP/Contents/Info.plist" <<PL
