@@ -11,10 +11,10 @@ import pytest
 REPO = Path(__file__).resolve().parents[2]
 TEXT_EXT = {".py", ".js", ".mjs", ".json", ".md", ".sh", ".html", ".css", ".txt", ".ini", ""}
 FORBIDDEN_EXT = {".wav", ".webm", ".ogg", ".mp3", ".m4a", ".pem", ".key", ".bin", ".gguf", ".safetensors", ".log", ".crx"}
-ALLOWED_EMAILS = {"noreply@anthropic.com"}
+ALLOWED_EMAILS: set[str] = set()
 EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z]{2,}")
 USER_PATH_RE = re.compile(r"/(?:Users|home)/([A-Za-z0-9._-]+)")
-ALLOWED_USERS = {"utente", "<nome>", "alex", "claude"}
+ALLOWED_USERS = {"utente", "<nome>", "alex"}
 
 
 def tracked():
@@ -50,7 +50,7 @@ def test_no_personal_data_in_tracked_files():
                 found.append((rel, m.group(0)))
         if "PRIVATE KEY" in txt and not rel.startswith("tests/"):
             found.append((rel, "PRIVATE KEY"))
-        if len(me) >= 4 and me not in ("root", "claude", "runner") and re.search(rf"\b{re.escape(me)}\b", txt, re.I):
+        if len(me) >= 4 and me not in ("root", "runner") and re.search(rf"\b{re.escape(me)}\b", txt, re.I):
             found.append((rel, "nome utente del sistema"))
     assert not found, found
 

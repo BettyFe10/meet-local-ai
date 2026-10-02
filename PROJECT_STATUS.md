@@ -198,7 +198,7 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 
 ## Test superati
 - Esecuzione script diagnostico su macOS: OK (report generato).
-- Accesso lettura/scrittura a `~/MeetLocalAI` da Claude: OK.
+- Accesso lettura/scrittura a `~/MeetLocalAI` dallo strumento di sviluppo: OK.
 
 ## Problemi aperti / rischi
 1. **Spazio disco limitato (29 GB liberi).** Stima ingombro progetto: ~8–10 GB (FFmpeg, venv, Whisper, Ollama + un LLM ~5 GB). Audio: WAV 16 kHz mono ≈ 115 MB/ora di riunione. Consigliato liberare spazio o prevedere archiviazione esterna.
@@ -212,4 +212,4 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 
 ## Punto esatto da cui riprendere
 Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → nessuna fase in sospeso: seguire "Cosa resta" in cima a questo file.
-- Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).
+- Nota: le operazioni git dall'ambiente di sviluppo isolato richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).

@@ -20,7 +20,7 @@
 ```bash
 cd ~/MeetLocalAI/app && git status && git push
 ```
-(I commit li crea Claude alla fine di ogni fase; il push lo fai tu.)
+(I commit vengono creati alla fine di ogni fase; il push va fatto a mano.)
 
 ## Il collega (Mac Apple Silicon)
 ```bash

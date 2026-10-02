@@ -6,7 +6,7 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Test | Esito | Note |
 |---|---|---|
 | Script diagnostico ambiente eseguito su macOS | SUPERATO | Output in `~/MeetLocalAI/Logs/env_report_fase1.txt` |
-| Cartella `~/MeetLocalAI` accessibile in lettura/scrittura da Claude | SUPERATO | |
+| Cartella `~/MeetLocalAI` accessibile in lettura/scrittura dallo strumento di sviluppo | SUPERATO | |
 | Porta 8765 libera | SUPERATO (al 28/09) | Da riverificare all'avvio backend |
 | Porta 11434 (Ollama) libera | SUPERATO (al 28/09) | |
 | Backend | NON TESTATA | Non ancora creato |
@@ -226,7 +226,7 @@ Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo
 
 Prova B (chiamata reale di 69 s, trascrizione imperfetta): gemma4:e4b non inventa decisioni né attività ("Non chiaramente determinabile…"); gemma4:12b crea un action item interpretando male una frase.
 Memoria: il valore di `/api/ps` per i modelli Gemma (≈0,3–1 GB) NON è attendibile → RAM reale NON MISURATA (da fare con `llm measure`); qwen3:8b ≈ 5,9–7,1 GB.
-Valutazione umana (Claude) dei verbali confrontati con `tests/fixtures/riunione_fittizia_marketing.expected.json`.
+Valutazione per lettura (non automatica) dei verbali, confrontati con `tests/fixtures/riunione_fittizia_marketing.expected.json`.
 
 ### Whisper — 2026-10-01, Mac mini M4 16 GB, riunione di test 68,6 s (tracce: scheda + microfono), modello large-v3-turbo
 | Motore | Traccia | Tempo | Rapporto realtime | RAM max* | Segmenti / caratteri |
