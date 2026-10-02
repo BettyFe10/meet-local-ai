@@ -132,10 +132,21 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] (U) Backend offline durante una registrazione reale — NON TESTATA
 - [ ] Gli ID riunione (con il titolo ripulito) compaiono nei log: valutare un ID anonimo nei log
 
-## FASE 14–16 (PROSSIMA: 14)
-- [ ] 14 Installer e portabilità (install_mac.sh, uninstall_mac.sh, SETUP-NEW-COMPUTER.md, Mac del collega M2 Pro 16 GB)
-- [ ] 15 UI/UX finale (opzione "qualità massima")
-- [ ] 16 Documentazione
+## FASE 14 — Installer e portabilità ✅
+- [x] install_mac.sh, uninstall_mac.sh, SETUP-NEW-COMPUTER.md, README
+- [x] Scelta del modello in base alla RAM, controlli preliminari
+- [x] (U) Disinstalla + reinstalla sul Mac di sviluppo
+- [ ] (U) Installazione sul Mac del collega (M2 Pro 16 GB) — NON TESTATA; richiede il repo su GitHub
+- [ ] Installazione su Mac "vuoto" (senza Homebrew/Python) — NON TESTATA
+- [ ] Lock completo delle dipendenze transitive
+
+## FASE 15 — UI/UX finale (PROSSIMA)
+- [ ] Opzione "qualità massima" (gemma4:12b) nelle impostazioni con avviso RAM/tempi
+- [ ] Avviso "disco quasi pieno"; avviso traccia muta durante la registrazione
+- [ ] Revisione testi, stati vuoti, messaggi d'errore, accessibilità di base
+
+## FASE 16 — Documentazione
+- [ ] README finale, guida utente, limiti noti, privacy
 
 ## Installazioni previste (NON ancora eseguite)
 - [ ] (U) `brew install ffmpeg` — Fase 6/7

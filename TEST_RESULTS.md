@@ -185,6 +185,17 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Avvio automatico dopo riavvio del Mac | Mac | NON TESTATA | |
 | Installazione su un altro Mac (M2 Pro 16 GB) | — | NON TESTATA | Fase 14 |
 
+## Fase 14 — 2026-10-02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (164 test) | VM Linux + Mac | SUPERATO | sul Mac eseguita dall'installer |
+| `uninstall_mac.sh --yes` (backend fermato, LaunchAgent e venv rimossi, dati intatti) | Mac mini M4 | SUPERATO | |
+| `install_mac.sh --yes` dopo la disinstallazione (venv ricreato, componenti presenti riconosciuti, LaunchAgent, diagnostica OK) | Mac mini M4 | SUPERATO | |
+| Installazione da zero (senza Homebrew, Python, modelli) | — | NON TESTATA | |
+| Installazione sul Mac del collega (M2 Pro 16 GB) | — | NON TESTATA | |
+| `uninstall_mac.sh --models`, `install_mac.sh --no-llm / --no-autostart / --check` su macOS | — | NON TESTATA | solo sintassi e opzioni nei test |
+| Estensione ancora PRONTO dopo la reinstallazione | Mac + Chrome | NON TESTATA | in attesa di conferma dell'utente |
+
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
 Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.

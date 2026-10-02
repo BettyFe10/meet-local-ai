@@ -4,19 +4,18 @@ Registra, trascrive e sintetizza le riunioni **Google Meet** interamente **sul p
 
 > **Stato: IN SVILUPPO — non ancora utilizzabile.** Avanzamento in [PROJECT_STATUS.md](PROJECT_STATUS.md), attività in [TODO.md](TODO.md).
 
-## Requisiti (previsti)
-- Mac con Apple Silicon (M1 o successivi), macOS recente
-- Google Chrome
-- ~10 GB liberi per strumenti e modelli + spazio per le registrazioni (~115 MB per ora di audio)
-- Homebrew
+## Requisiti
+- Mac con Apple Silicon (M1 o successivi), 16 GB di RAM consigliati
+- Google Chrome, Homebrew
+- ~12 GB liberi per strumenti e modelli + ~170 MB per ora di riunione
 
-## Installazione su un nuovo Mac
-Verrà descritta in `SETUP-NEW-COMPUTER.md` (Fase 14). In sintesi sarà:
+## Installazione
 ```bash
-git clone <URL-del-repository> ~/MeetLocalAI/app   # la cartella può essere qualsiasi
+git clone <URL-del-repository> ~/MeetLocalAI/app
 cd ~/MeetLocalAI/app && ./install_mac.sh
 ```
-Poi: Chrome → `chrome://extensions` → Modalità sviluppatore → "Carica estensione non pacchettizzata" → cartella `extension/`.
+Poi si carica l'estensione in Chrome (cartella `extension/`). Guida passo passo: [SETUP-NEW-COMPUTER.md](SETUP-NEW-COMPUTER.md).
+Diagnostica: `./diagnose.sh` · Disinstallazione: `./uninstall_mac.sh`
 
 I dati (riunioni, modelli, log, configurazione) vivono **fuori dal repository** in `~/MeetLocalAI/` e non vengono mai committati.
 

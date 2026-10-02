@@ -69,7 +69,7 @@ def test_no_remote_urls_in_extension_code():
 
 def test_shell_scripts_are_executable_and_parse():
     scripts = [p for p in tracked() if p.suffix == ".sh"]
-    assert {"diagnose.sh", "start_backend.sh", "stop_backend.sh"} <= {p.name for p in scripts}
+    assert {"diagnose.sh", "start_backend.sh", "stop_backend.sh", "install_mac.sh", "uninstall_mac.sh"} <= {p.name for p in scripts}
     for p in scripts:
         assert os.access(p, os.X_OK), f"{p.name} non eseguibile"
         r = subprocess.run(["bash", "-n", str(p)], capture_output=True, text=True)
@@ -88,3 +88,23 @@ def test_python_requirements_are_pinned():
             line = line.strip()
             if line and not line.startswith(("#", "-r")):
                 assert "==" in line, f"{f}: {line}"
+
+
+def test_installer_help_and_safety():
+    for name in ("install_mac.sh", "uninstall_mac.sh"):
+        r = subprocess.run(["bash", str(REPO / name), "--help"], capture_output=True, text=True)
+        assert r.returncode == 0 and "Uso:" in r.stdout, name
+        assert subprocess.run(["bash", str(REPO / name), "--boh"], capture_output=True).returncode == 2
+    un = (REPO / "uninstall_mac.sh").read_text()
+    assert "Meetings" not in "".join(l for l in un.splitlines() if "rm -rf" in l)      # mai cancellare le riunioni
+    assert un.count("rm -rf") == 2
+    assert (REPO / "SETUP-NEW-COMPUTER.md").is_file()
+
+
+def test_install_ram_tiers_match_backend():
+    """Le fasce di RAM dell'installer devono coincidere con quelle del backend."""
+    from meetlocalai import llm
+    sh = (REPO / "install_mac.sh").read_text()
+    for gb, model in ((32, llm.recommended_model(32)), (16, llm.recommended_model(16)), (8, llm.recommended_model(8))):
+        assert model in sh, (gb, model)
+    assert sorted(t[0] for t in llm.RAM_TIERS if t[0] > 0) == [12, 24]

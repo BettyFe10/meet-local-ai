@@ -1,8 +1,17 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-02
-**Fase corrente:** FASE 13 — Test completi → ✅ COMPLETATA (suite e diagnostica eseguite sul Mac)
-**Prossima fase:** FASE 14 — Installer e portabilità (NON ANCORA INIZIATA)
+**Fase corrente:** FASE 14 — Installer e portabilità → ✅ COMPLETATA sul Mac di sviluppo (installazione su un Mac nuovo: NON TESTATA)
+**Prossima fase:** FASE 15 — UI/UX finale (NON ANCORA INIZIATA)
+
+## Fase 14 — cosa è stato fatto
+- `install_mac.sh` (radice): controllo del Mac (Apple Silicon, RAM → modello, spazio, Homebrew, Chrome, porta, Python, cartella non protetta), conferma, poi `setup_backend.sh` → `setup_whisper.sh` → `setup_llm.sh` → `launchagent.sh install` → `diagnose.sh` → istruzioni per caricare l'estensione. Idempotente. Opzioni `--check`, `--yes`, `--no-llm`, `--no-autostart`.
+- `uninstall_mac.sh`: ferma il backend, rimuove LaunchAgent e ambiente Python; `--models` rimuove anche i modelli. **Non cancella mai** riunioni, export, configurazione; i programmi Homebrew non vengono toccati (comandi stampati).
+- `SETUP-NEW-COMPUTER.md`: guida per il collega (requisiti, clone, installazione, estensione, prova, problemi, aggiornamento, disinstallazione). README aggiornato.
+- Test: 164 (aiuto e opzioni degli script, nessun `rm -rf` sulle riunioni, fasce di RAM dell'installer allineate al backend).
+- Prova sul Mac di sviluppo: `uninstall_mac.sh --yes` poi `install_mac.sh --yes` → ambiente Python ricreato, 164 test superati, componenti già presenti riconosciuti, backend riavviato dal LaunchAgent, diagnostica "Nessun problema rilevato".
+- NON TESTATE: installazione da zero su un Mac senza nulla (Homebrew/Python/modelli assenti), Mac del collega (M2 Pro 16 GB), `--models`, `--no-llm`, fascia <12 GB e ≥24 GB di RAM.
+- Debito: dipendenze Python transitive non bloccate (solo quelle dirette hanno versione fissa).
 
 ## Fase 13 — cosa è stato fatto
 - Test: **162** (erano 147), eseguiti sia nella VM Linux sia **sul Mac** (Python 3.12.6): tutti superati.
@@ -180,5 +189,5 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 14.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 15.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).
