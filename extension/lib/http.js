@@ -56,7 +56,8 @@ export function makeClient(getBaseUrl, fetchImpl = (...a) => fetch(...a)) {
     stopMeeting: (id, clientDurationSeconds) =>
       request(`/meetings/${enc(id)}/stop`, { method: "POST", body: { client_duration_seconds: clientDurationSeconds }, timeoutMs: 8000 }),
     getTranscript: (id, format = "txt") => request(`/meetings/${enc(id)}/transcript?format=${format}`, { as: "text", timeoutMs: 10000 }),
-    reprocessMeeting: (id) => request(`/meetings/${enc(id)}/reprocess`, { method: "POST" }),
+    getSummary: (id) => request(`/meetings/${enc(id)}/summary`, { timeoutMs: 10000 }),
+    reprocessMeeting: (id, steps) => request(`/meetings/${enc(id)}/reprocess`, { method: "POST", body: steps ? { steps } : {} }),
     renameMeeting: (id, title) => request(`/meetings/${enc(id)}`, { method: "PATCH", body: { title } }),
     sendChunk: (id, track, seq, blob) =>
       request(`/meetings/${enc(id)}/chunks?track=${enc(track)}&seq=${seq}`,

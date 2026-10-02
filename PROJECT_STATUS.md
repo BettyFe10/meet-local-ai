@@ -1,8 +1,18 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-02
-**Fase corrente:** FASE 9 — LLM locale → benchmark ✅ e modello scelto; **manca solo l'installazione definitiva del modello sul Mac (U)**
-**Prossima fase:** FASE 10 — Summary (dopo l'installazione del modello)
+**Fase corrente:** FASE 9 ✅ e FASE 10 ✅ — LLM locale e sintesi automatica (verificate sul Mac)
+**Prossima fase:** FASE 11 — Dashboard (NON ANCORA INIZIATA)
+
+## Fase 10 — cosa è stato fatto
+- Modello installato sul Mac: **gemma4:e4b** in `~/MeetLocalAI/Models/ollama` (6,2 GB su disco, ~4,3–6,4 GB di RAM in uso); qwen3:4b residuo rimosso.
+- `summarize.py`: sintesi a **due passaggi** (appunti fedeli → verbale; D-040), a blocchi per le riunioni lunghe (>~12k token), controllo del formato con un nuovo tentativo, normalizzazione (7 sezioni fisse, sezioni vuote → "Non chiaramente determinabile dalla trascrizione."). Prompt **v3**.
+- Pipeline: `transcribed → summarizing → completed`; `summary.md` nella cartella; Ollama acceso solo durante la sintesi. Se il modello manca/fallisce la riunione resta `transcribed` con avviso (la trascrizione è sempre salva).
+- API: `GET /meetings/{id}/summary` (markdown + sezioni), `POST /meetings/{id}/reprocess {"steps":["summarize"]}` (solo sintesi).
+- Estensione: sezioni del verbale nella pagina riunione, avvisi, pulsante **Genera/Rigenera sintesi**; rendering Markdown sicuro (niente innerHTML).
+- Verifica sul Mac: RIUNIONE-DI-TEST → `completed` (sintesi 40 s, due passaggi); riunione fittizia: 4/4 decisioni, impegno in prima persona recuperato; modalità a blocchi provata su ~15,7k token (123 s). Utente: "tutto ok".
+- Limiti noti (gemma4:e4b, prompt v3): può omettere un tema rimandato (TikTok) e può trasformare in attività un impegno solo implicito (fotografo → "Partecipanti"). Nessun dato inventato osservato. Vedi TEST_RESULTS.
+- Test: 130.
 
 ## Fase 9 — cosa è stato fatto
 - Requisito aggiunto dall'utente: deve funzionare bene anche sul Mac del collega (**MacBook Pro M2 Pro, 16 GB**) → scelte tarate sulla fascia 16 GB, non sul solo Mac di sviluppo; modello scelto automaticamente in base alla RAM (`llm.model = "auto"`).
@@ -138,10 +148,9 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 4. Le mie azioni sul Mac passano da una VM che vede solo `~/MeetLocalAI`: installazioni di sistema (brew, Ollama) e il caricamento dell'estensione in Chrome richiederanno che l'utente esegua comandi/script forniti.
 
 ## Operazioni che richiedono intervento dell'utente
-- Installare il modello dei riassunti: `cd ~/MeetLocalAI/app && bash installer/setup_llm.sh && ./stop_backend.sh; ./start_backend.sh`
 - (Opzionale, quando vuoi) Pubblicare su GitHub privato seguendo `docs/GITHUB.md` (creare repo + `git push`).
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → verificare che `setup_llm.sh` sia stato eseguito (health: Modello locale ✓), poi iniziare FASE 10.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 11.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).

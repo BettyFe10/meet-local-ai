@@ -126,9 +126,23 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Suite completa (114 test) | VM Linux | SUPERATO | client Ollama con server finto: blocco cloud, think off, modello mancante, scelta per RAM, health |
 | Benchmark 4 modelli (download → 3 prove → rimozione) | Mac M4 16 GB | SUPERATO | tabella sotto; un solo modello alla volta su disco |
 | Nessun modello cloud utilizzabile | VM (test) | SUPERATO | nomi con "cloud" rifiutati prima di ogni chiamata |
-| Installazione definitiva gemma4:e4b + health "Modello locale ✓" | Mac | NON TESTATA | in attesa dell'utente |
-| RAM reale del modello | Mac | NON MISURATA | |
+| Installazione definitiva gemma4:e4b | Mac | SUPERATO | 6,2 GB su disco |
+| RAM reale dei processi Ollama con gemma4:e4b | Mac | MISURATO | 4,2–6,4 GB (ps), contesto 8k–16k |
 | Funzionamento su MacBook Pro M2 Pro 16 GB (collega) | — | NON TESTATA | atteso pari o migliore (GPU e banda di memoria superiori) |
+
+## Fase 10 — 2026-10-02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (130 test) | VM Linux | SUPERATO | sintesi con client finto: due passaggi, blocchi, riprovo, normalizzazione, pipeline → completed, LLM assente/errore, solo-sintesi |
+| Sintesi automatica di RIUNIONE-DI-TEST → `completed` | Mac | SUPERATO | due passaggi, 40 s; nessuna decisione/attività inventata |
+| Ollama acceso solo durante la sintesi e poi fermato | Mac (log) | SUPERATO | "ollama serve avviato su richiesta" / "fermato" |
+| Riunione fittizia, prompt v2 passaggio unico | Mac | PARZIALE | 4/4 decisioni; 2/4 attività; TikTok omesso → sostituito dai due passaggi |
+| Riunione fittizia, prompt v3 due passaggi | Mac | SUPERATO con limiti | 72 s; 4/4 decisioni; 3/4 attività corrette (incl. "Microfono locale (chi ha registrato)") + 1 attività dedotta (fotografo → "Partecipanti"); sito senza responsabile in Prossimi passi; TikTok rimandato omesso; nessun dato inventato |
+| Modalità a blocchi (~15,7k token ≈ 60 min) | Mac | SUPERATO | 2 blocchi + unione, 123 s, verbale completo (4/4 attività, TikTok tra le domande aperte) |
+| Pagina riunione con sezioni + Rigenera sintesi | Mac + Chrome | SUPERATO | utente: "tutto ok" |
+| Sezione con soli "non determinabile" nel formato action item | Mac | CORRETTO | ora compattata in una riga (test) |
+| Riunione reale lunga (≥30 min) end-to-end | — | NON TESTATA | |
+| MacBook Pro M2 Pro 16 GB (collega) | — | NON TESTATA | |
 
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1

@@ -62,3 +62,31 @@ export function meetCodeFromUrl(url) {
   const m = MEET_URL_RE.exec(url || "");
   return m ? m[1] : null;
 }
+
+// Markdown minimo → DOM sicuro (elenchi puntati, grassetto **x**, paragrafi). Niente innerHTML.
+function inline(text) {
+  const out = [];
+  for (const part of String(text).split(/(\*\*[^*]+\*\*)/g)) {
+    if (!part) continue;
+    out.push(part.startsWith("**") && part.endsWith("**") ? el("strong", {}, part.slice(2, -2)) : part);
+  }
+  return out;
+}
+
+export function renderMarkdownLite(md) {
+  const frag = document.createDocumentFragment();
+  let list = null;
+  for (const raw of String(md || "").split("\n")) {
+    const line = raw.trim();
+    if (!line) { list = null; continue; }
+    const m = /^([-*•]|\d+[.)])\s+(.*)$/.exec(line);
+    if (m) {
+      if (!list) { list = el("ul", {}); frag.append(list); }
+      list.append(el("li", {}, inline(m[2])));
+    } else {
+      list = null;
+      frag.append(el("p", {}, inline(line)));
+    }
+  }
+  return frag;
+}

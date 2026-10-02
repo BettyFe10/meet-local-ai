@@ -87,24 +87,31 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] (U) Confermare che dopo il ritorno a "senza VAD" la trascrizione di RIUNIONE-DI-TEST è tornata come prima
 - [ ] Avviso in tempo reale durante la registrazione se la traccia della riunione resta muta (oggi solo a posteriori)
 
-## FASE 9 — LLM locale (quasi completa)
+## FASE 9 — LLM locale ✅
 - [x] Ricerca modelli multilingue con licenza permissiva (Apache 2.0) per 16 GB
 - [x] Client Ollama locale, blocco modelli cloud, server su richiesta
 - [x] Benchmark su riunione fittizia con verità nota + riunione reale + testo lungo
 - [x] Scelta: gemma4:e4b per 16 GB (D-037)
-- [ ] (U) Installare il modello definitivo con `installer/setup_llm.sh` e verificare health
-- [ ] Misurare la RAM reale dei processi Ollama (`python -m meetlocalai.llm measure`) — il dato di /api/ps per Gemma non è attendibile
+- [x] (U) Modello definitivo installato (gemma4:e4b)
+- [x] RAM reale dei processi Ollama misurata: ~4,3–6,4 GB
 - [ ] Fascia 8 GB (gemma4:e2b) NON TESTATA; qwen3:4b scartato (non rispetta think:false, output in inglese)
 
-## FASE 10 — Summary (PROSSIMA)
-- [ ] Passo `summarizing` nella pipeline → `summary.md`, stato `completed`; fallimento LLM non blocca la trascrizione
-- [ ] Prompt v2: includere gli impegni presi in prima persona ("lo comunico io"), formato action item sempre completo
-- [ ] Controllo dell'output (deve iniziare con "## TL;DR", niente ragionamenti/inglese) + un nuovo tentativo se non valido
-- [ ] Riunioni lunghe: sintesi a blocchi + unione se la trascrizione supera il contesto
-- [ ] Endpoint summary + sezioni nella pagina riunione
-- [ ] Opzione "qualità massima" (gemma4:12b) nelle impostazioni, con avviso su RAM/tempi
+## FASE 10 — Summary ✅
+- [x] Passo `summarizing` → `summary.md`, stato `completed`; fallimento LLM non blocca la trascrizione
+- [x] Prompt v3 a due passaggi: impegni in prima persona, formato action item con etichette
+- [x] Controllo dell'output + un nuovo tentativo; normalizzazione sezioni
+- [x] Riunioni lunghe: sintesi a blocchi + unione
+- [x] Endpoint summary + sezioni nella pagina riunione + "Rigenera sintesi"
+- [ ] Opzione "qualità massima" (gemma4:12b) nelle impostazioni, con avviso su RAM/tempi — Fase 15
+- [ ] Qualità: temi rimandati a volte omessi; impegni impliciti a volte promossi ad attività → valutare ancora il prompt o gemma4:12b
+- [ ] Provare la sintesi su una riunione reale lunga (≥30 min) — NON TESTATA
 
-## FASE 11–16
+## FASE 11 — Dashboard (PROSSIMA)
+- [ ] Elenco riunioni rifinito: ricerca, ordinamento, stato/avanzamento in tempo reale, avvisi
+- [ ] Pagina riunione: player audio (`GET /meetings/{id}/audio` con Range), rinomina titolo, Apri cartella
+- [ ] Indicatore di elaborazione in corso (coda) anche nel popup
+
+## FASE 12–16
 - [ ] Vedi ordine fasi nel brief (Trascrizione completa → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
 
 ## Installazioni previste (NON ancora eseguite)

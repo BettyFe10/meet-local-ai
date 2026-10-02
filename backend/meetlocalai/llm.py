@@ -204,7 +204,7 @@ class OllamaClient:
 
 
 def main(argv: list[str]) -> int:
-    """python -m meetlocalai.llm install [modello] | which | measure"""
+    """python -m meetlocalai.llm install [modello] | remove <modello> | which | measure"""
     import sys  # noqa: PLC0415
 
     from . import config as config_mod, summary_prompt  # noqa: PLC0415
@@ -227,6 +227,13 @@ def main(argv: list[str]) -> int:
                 client.pull(model)
             r = client.chat(model, "Rispondi solo con: OK", "Test", num_ctx=2048)
             print(f"Modello pronto: {model} (risposta di prova in {r['stats']['total_s']} s)")
+            return 0
+        if cmd == "remove":
+            if model in client.installed_models():
+                client.delete(model)
+                print(f"Modello rimosso: {model}")
+            else:
+                print(f"Modello non presente: {model}")
             return 0
         if cmd == "measure":
             fixture = (paths_fixture()).read_text(encoding="utf-8")

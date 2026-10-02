@@ -53,7 +53,8 @@
       "DOMANDE APERTE",
       "PROSSIMI PASSI"
     ],
-    "not_determinable_text": "Non chiaramente determinabile dalla trascrizione."
+    "not_determinable_text": "Non chiaramente determinabile dalla trascrizione.",
+    "two_pass": true
   },
   "logging": {
     "level": "INFO",

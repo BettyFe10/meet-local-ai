@@ -114,15 +114,33 @@ def create_app(cfg: dict | None = None) -> FastAPI:
         return md
 
     @app.post("/api/v1/meetings/{meeting_id}/reprocess")
-    def post_reprocess(meeting_id: str):
+    def post_reprocess(meeting_id: str, payload: dict = Body(default={})):
+        """Rimette in coda l'elaborazione. {"steps": ["summarize"]} = rifà solo la sintesi."""
         try:
             md = meetings.get_meeting(meetings_dir, meeting_id)
         except meetings.MeetingNotFound:
             return _not_found()
         if md.get("status") in ("recording", "interrupted"):
             raise recording.RecordingError(409, "still_recording", "La registrazione è ancora attiva.")
-        queued = processor.enqueue(meeting_id)
+        only_summary = payload.get("steps") == ["summarize"]
+        if only_summary and not (meetings_dir / md["id"] / "transcript.txt").exists():
+            raise recording.RecordingError(409, "transcript_not_ready", "Trascrizione non ancora disponibile.")
+        queued = processor.enqueue(meeting_id, "summary" if only_summary else "full")
         return {"queued": queued, "queue_length": processor.status()["queue_length"]}
+
+    @app.get("/api/v1/meetings/{meeting_id}/summary")
+    def get_summary(meeting_id: str):
+        from . import summarize as summ  # noqa: PLC0415
+        try:
+            md = meetings.get_meeting(meetings_dir, meeting_id)
+        except meetings.MeetingNotFound:
+            return _not_found()
+        f = meetings_dir / md["id"] / "summary.md"
+        if not f.exists():
+            return JSONResponse(status_code=404, content={"error_code": "summary_not_ready",
+                                                          "user_message": "Sintesi non ancora disponibile.", "detail_logged": False})
+        text = f.read_text(encoding="utf-8")
+        return {"markdown": text, "sections": summ.parse_sections(text), "model": md.get("llm", {}).get("model")}
 
     @app.get("/api/v1/meetings/{meeting_id}/transcript")
     def get_transcript(meeting_id: str, format: str = Query("txt", pattern="^(txt|md)$")):

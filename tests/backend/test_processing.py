@@ -133,6 +133,6 @@ def test_silent_track_is_skipped_with_warning(fake_whispercpp, client):
     client.post(f"/api/v1/meetings/{md['id']}/stop", headers=HDR, json={})
     out = client.app.state.processor.process(md["id"])
     assert out["status"] == "transcribed"
-    assert out["warnings"] == ['Traccia "Partecipanti" muta: non trascritta.']
+    assert out["warnings"][0] == 'Traccia "Partecipanti" muta: non trascritta.'
     txt = (folder / "transcript.txt").read_text()
     assert "Partecipanti:" not in txt and "Microfono locale:" in txt

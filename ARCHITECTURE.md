@@ -63,7 +63,8 @@ backend/
     transcribe.py     motori Whisper (whisper.cpp predefinito; mlx opzionale), senza rete
     bench.py          benchmark motori (tempo, RTF, RAM; --repeat, --no-vad)
     llm.py            client Ollama locale (loopback, no cloud, server su richiesta, scelta modello per RAM)
-    summary_prompt.py prompt del verbale
+    summary_prompt.py prompt del verbale (v3: appunti → verbale)
+    summarize.py      sintesi a due passaggi / a blocchi, validazione e normalizzazione
     bench_llm.py      benchmark modelli LLM
     processing.py     coda di elaborazione: conversione → trascrizione → file transcript.*
     logging_setup.py  RotatingFileHandler in <logs_dir>/backend.log
@@ -111,11 +112,11 @@ Impostazioni leggere in `chrome.storage.local`; impostazioni di elaborazione nel
 | GET | `/meetings?limit=&offset=` | elenco per dashboard (ordinato per data desc) |
 | GET | `/meetings/{id}` | metadata |
 | PATCH | `/meetings/{id}` | `{title}` |
-| GET | `/meetings/{id}/summary` | `text/markdown` |
+| GET | `/meetings/{id}/summary` | `{markdown, sections, model}` |
 | GET | `/meetings/{id}/transcript?format=txt\|md` | testo |
 | GET | `/meetings/{id}/audio` | `audio/wav`, supporta HTTP Range |
 | GET | `/meetings/{id}/export?format=md\|txt` | download; copia anche in `Exports/` |
-| POST | `/meetings/{id}/reprocess` | rimette in coda l'elaborazione |
+| POST | `/meetings/{id}/reprocess` | rimette in coda; `{"steps":["summarize"]}` = solo sintesi |
 | POST | `/meetings/{id}/open-folder` | apre la cartella nel Finder |
 | POST | `/open-data-root` | apre `~/MeetLocalAI` nel Finder |
 

@@ -20,14 +20,15 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import audio, messages, transcribe
+from . import audio, health, llm, messages, summarize, transcribe
 from .meetings import ID_RE, MeetingNotFound, _read_metadata
 from .recording import iso, now, write_metadata
 
 log = logging.getLogger("meetlocalai.processing")
 
 LABELS = {"mic": "Microfono locale", "tab": "Partecipanti"}
-PENDING = ("stopped", "converting", "transcribing")
+PENDING = ("stopped", "converting", "transcribing", "summarizing")
+NO_SUMMARY = "Sintesi non generata: "
 MERGE_GAP_S = 2.0
 SILENT_TRACK_DB = -60.0   # picco sotto questa soglia = traccia muta (es. scheda Meet senza audio)
 
@@ -117,17 +118,21 @@ def _peak_rss_mb() -> float:
 class Processor:
     def __init__(self, cfg: dict, dirs: dict, lock: threading.Lock):
         self.cfg, self.dirs, self.lock = cfg, dirs, lock
-        self.q: queue.Queue[str] = queue.Queue()
+        self.q: queue.Queue[tuple[str, str]] = queue.Queue()
         self.current: dict | None = None
         self._queued: set[str] = set()
         self._thread: threading.Thread | None = None
+        # sostituibile nei test
+        self.llm_client_factory = lambda: llm.OllamaClient(
+            cfg["llm"]["base_url"], dirs["models_dir"], keep_alive=cfg["llm"].get("keep_alive", "30s"))
 
     # ---------- coda ----------
-    def enqueue(self, meeting_id: str) -> bool:
+    def enqueue(self, meeting_id: str, mode: str = "full") -> bool:
+        """mode: "full" (conversione+trascrizione+sintesi) oppure "summary" (solo sintesi da trascrizione esistente)."""
         if meeting_id in self._queued or (self.current and self.current["id"] == meeting_id):
             return False
         self._queued.add(meeting_id)
-        self.q.put(meeting_id)
+        self.q.put((meeting_id, mode))
         return True
 
     def recover(self) -> list[str]:
@@ -139,7 +144,8 @@ class Processor:
                 if f.is_dir() and ID_RE.match(f.name):
                     md = _read_metadata(f)
                     if md and md.get("status") in PENDING:
-                        self.enqueue(f.name)
+                        only_summary = md["status"] == "summarizing" and (f / "transcript.txt").exists()
+                        self.enqueue(f.name, "summary" if only_summary else "full")
                         found.append(f.name)
         return found
 
@@ -150,10 +156,10 @@ class Processor:
 
     def _loop(self) -> None:
         while True:
-            mid = self.q.get()
+            mid, mode = self.q.get()
             self._queued.discard(mid)
             try:
-                self.process(mid)
+                self.process(mid, mode)
             except Exception:  # noqa: BLE001 - il worker non deve mai morire
                 log.exception("Errore inatteso elaborando %s", mid)
 
@@ -179,7 +185,7 @@ class Processor:
         log.error("Elaborazione %s fallita al passo %s: %s", folder.name, step, user_message)
 
     # ---------- pipeline ----------
-    def process(self, meeting_id: str) -> dict:
+    def process(self, meeting_id: str, mode: str = "full") -> dict:
         folder = self.dirs["meetings_dir"] / meeting_id
         md = _read_metadata(folder)
         if md is None:
@@ -187,6 +193,12 @@ class Processor:
         if md.get("status") in ("recording", "interrupted"):
             log.warning("Riunione %s ancora in registrazione: elaborazione saltata", meeting_id)
             return md
+        if mode == "summary" and (folder / "transcript.txt").exists():
+            self.current = {"id": meeting_id, "step": "summarizing", "started": iso(now())}
+            try:
+                return self._summarize(folder)
+            finally:
+                self.current = None
         work = self.dirs["temp_dir"] / meeting_id
         self.current = {"id": meeting_id, "step": "converting", "started": iso(now())}
         try:
@@ -241,7 +253,48 @@ class Processor:
                              "peak_rss_mb": _peak_rss_mb(),
                              "disk_bytes": sum(p.stat().st_size for p in folder.rglob("*") if p.is_file())})
             log.info("Riunione %s trascritta: audio %.0f s, trascrizione %.1f s, %d blocchi", meeting_id, dur, tr_s, len(lines))
-            return md
+            # 3) sintesi (un suo fallimento non invalida la trascrizione)
+            self.current["step"] = "summarizing"
+            return self._summarize(folder)
         finally:
             self.current = None
             shutil.rmtree(work, ignore_errors=True)
+
+    def _summarize(self, folder: Path) -> dict:
+        """transcribed → summarizing → completed. Se la sintesi non è possibile resta "transcribed" con un avviso."""
+        md = _read_metadata(folder)
+        keep = [w for w in (md.get("warnings") or []) if not w.startswith(NO_SUMMARY)]
+
+        def skip(reason: str) -> dict:
+            log.warning("Riunione %s: sintesi non generata (%s)", folder.name, reason)
+            return self._update(folder, status="transcribed", warnings=keep + [NO_SUMMARY + reason])
+
+        if not self.cfg.get("summary", {}).get("enabled", True):
+            return self._update(folder, status="transcribed", warnings=keep)
+        transcript = (folder / "transcript.txt").read_text(encoding="utf-8").strip()
+        if not transcript:
+            return skip("nessun parlato riconosciuto.")
+        model = llm.resolve_model(self.cfg)
+        if not health.check_llm(self.cfg, self.dirs["models_dir"])["available"]:
+            return skip(messages.LLM_UNAVAILABLE)
+        self._update(folder, status="summarizing", warnings=keep, llm={"provider": "ollama", "model": model})
+        client = self.llm_client_factory()
+        try:
+            client.ensure_server()
+            r = summarize.summarize(client, model, md["title"], transcript,
+                                    temperature=self.cfg["llm"].get("temperature", 0.2),
+                                    two_pass=self.cfg.get("summary", {}).get("two_pass", True))
+        except (llm.LLMError, summarize.SummaryError) as e:
+            log.error("Riunione %s: errore sintesi: %s", folder.name, getattr(e, "detail", "") or e.user_message)
+            return skip(e.user_message)
+        finally:
+            client.stop_server()
+        (folder / "summary.md").write_text(summarize.render_summary_file(md, r["markdown"], model), encoding="utf-8")
+        st = r["stats"]
+        out = self._update(
+            folder, status="completed", files={"summary_md": "summary.md"},
+            performance={"summary_seconds": st["seconds"], "summary_mode": st["mode"], "summary_calls": st["calls"],
+                         "disk_bytes": sum(p.stat().st_size for p in folder.rglob("*") if p.is_file())},
+            summary={"prompt_version": st["prompt_version"], "retries": st["retries"]})
+        log.info("Riunione %s: sintesi pronta in %.1f s (%s, %d chiamate)", folder.name, st["seconds"], st["mode"], st["calls"])
+        return out
