@@ -194,7 +194,7 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Installazione da zero (senza Homebrew, Python, modelli) | — | NON TESTATA | |
 | Installazione sul Mac del collega (M2 Pro 16 GB) | — | NON TESTATA | |
 | `uninstall_mac.sh --models`, `install_mac.sh --no-llm / --no-autostart / --check` su macOS | — | NON TESTATA | solo sintassi e opzioni nei test |
-| Estensione ancora PRONTO dopo la reinstallazione | Mac + Chrome | NON TESTATA | in attesa di conferma dell'utente |
+| Estensione ancora PRONTO dopo la reinstallazione | Mac + Chrome | SUPERATO | confermato dall'utente |
 
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
