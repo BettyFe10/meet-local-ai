@@ -10,6 +10,8 @@ export const IDLE = Object.freeze({
 const BUSY = new Set(["starting", "recording", "stopping"]);
 export const MSG_TAB_SILENT = "Nessun audio dalla riunione finora: controlla che la scheda Meet non sia silenziata.";
 const MSG_CAPTURE = "Impossibile catturare l'audio della scheda Meet.";
+// Aggiunge un dettaglio tecnico breve (serve all'assistenza): A = permesso/flusso della scheda, B = avvio della registrazione.
+const withDetail = (text, code, detail) => (detail ? `${text} [${code}: ${String(detail).slice(0, 120)}]` : text);
 
 export function createController({ api, store, badge, capture, now = () => Date.now(), log = () => {} }) {
   const msg = (e, fallback) => e?.userMessage || fallback;
@@ -24,12 +26,12 @@ export function createController({ api, store, badge, capture, now = () => Date.
     return ns;
   }
 
-  async function start({ title = "", meetCode = null, tabId = null, tracks = ["tab"], streamId = null } = {}) {
+  async function start({ title = "", meetCode = null, tabId = null, tracks = ["tab"], streamId = null, streamError = null } = {}) {
     const s = await getState();
     if (BUSY.has(s.state)) return { ok: false, error: "Registrazione già in corso.", state: s };
     const keep = { lastMeetingId: s.lastMeetingId };
     if (!streamId) {
-      const ns = { ...IDLE, ...keep, error: MSG_CAPTURE };
+      const ns = { ...IDLE, ...keep, error: withDetail(MSG_CAPTURE, "A", streamError) };
       await store.set(ns);
       return { ok: false, error: ns.error, state: ns };
     }
@@ -48,7 +50,7 @@ export function createController({ api, store, badge, capture, now = () => Date.
       log("cattura fallita", cap?.detail || cap?.error);
       await capture.close().catch(() => {});
       await api.stopMeeting(md.id, 0).catch(() => {});
-      const ns = { ...IDLE, ...keep, error: cap?.error || MSG_CAPTURE };
+      const ns = { ...IDLE, ...keep, error: withDetail(cap?.error || MSG_CAPTURE, "B", cap?.detail) };
       await store.set(ns);
       await badge.idle();
       return { ok: false, error: ns.error, state: ns };

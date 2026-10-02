@@ -56,6 +56,7 @@ async function refresh() {
 }
 
 async function init() {
+  $("version").textContent = `v${chrome.runtime.getManifest().version}`;
   $("dashboard").addEventListener("click", () => openExtensionPage("dashboard.html"));
   $("openSaved").addEventListener("click", async (ev) => {
     ev.preventDefault();
@@ -66,15 +67,17 @@ async function init() {
   $("start").addEventListener("click", async () => {
     $("start").disabled = true;
     let streamId = null;
+    let streamError = null;
     try {
       // richiede il gesto dell'utente (clic sull'icona dell'estensione): per questo si ottiene qui nel popup
       streamId = await chrome.tabCapture.getMediaStreamId({ targetTabId: meetTab.id });
     } catch (e) {
       console.warn("[MeetLocalAI] getMediaStreamId:", e);
+      streamError = e?.message || String(e);
     }
     const { captureMic } = await chrome.storage.local.get({ captureMic: true });
     const tracks = captureMic && micGranted ? ["tab", "mic"] : ["tab"];
-    const r = await send("start", { title: $("title").value.trim(), meetCode: meetTab.code, tabId: meetTab.id, tracks, streamId });
+    const r = await send("start", { title: $("title").value.trim(), meetCode: meetTab.code, tabId: meetTab.id, tracks, streamId, streamError });
     render(r.state);
   });
   $("stop").addEventListener("click", async () => {

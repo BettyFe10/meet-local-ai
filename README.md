@@ -67,6 +67,6 @@ backend/.venv/bin/python -m pytest   # test automatici
 I dati (riunioni, modelli, log, configurazione) stanno **fuori dal repository**, in `~/MeetLocalAI/`.
 
 ## Stato
-Versione 0.1.0, completa e in uso. Prove effettuate e limiti: [TEST_RESULTS.md](TEST_RESULTS.md), [docs/LIMITI-NOTI.md](docs/LIMITI-NOTI.md).
+Versione 0.2.0, completa e in uso. Prove effettuate e limiti: [TEST_RESULTS.md](TEST_RESULTS.md), [docs/LIMITI-NOTI.md](docs/LIMITI-NOTI.md).
 
 Licenza: uso interno, nessuna licenza open source assegnata (vedi DECISIONS D-020).
