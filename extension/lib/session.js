@@ -20,7 +20,8 @@ export function micProblem(name) {
 export class RecorderSession {
   constructor({ meetingId, streamId, tracks = ["tab"], chunkMs = 5000, send, notify = () => {},
                 getUserMedia, MediaRecorderImpl, AudioContextImpl, uploaderOpts = {},
-                silenceWarnMs = 45000, silenceCheckMs = 2000, setIntervalImpl = setInterval, clearIntervalImpl = clearInterval }) {
+                silenceWarnMs = 45000, silenceCheckMs = 2000, // funzioni freccia: nel browser setInterval non può essere chiamato come metodo di un altro oggetto
+                setIntervalImpl = (fn, ms) => setInterval(fn, ms), clearIntervalImpl = (id) => clearInterval(id) }) {
     Object.assign(this, { meetingId, streamId, tracks, chunkMs, send, notify, getUserMedia, MediaRecorderImpl, AudioContextImpl, uploaderOpts,
                           silenceWarnMs, silenceCheckMs, setIntervalImpl, clearIntervalImpl });
     this.silence = { timer: null, quietMs: 0, warned: false };

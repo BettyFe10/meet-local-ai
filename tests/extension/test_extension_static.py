@@ -109,3 +109,13 @@ def test_offscreen_uses_only_runtime_api():
         txt = f.read_text(encoding="utf-8")
         for api in re.findall(r"chrome\.([a-zA-Z]+)", txt):
             assert api == "runtime", f"{f.name} usa chrome.{api}"
+
+
+def test_no_native_timer_functions_stored_as_methods():
+    """Nel browser `this.x = setInterval; this.x()` lancia "Illegal invocation" (in Node no): vietato come default."""
+    import re
+    from pathlib import Path
+    for f in (Path(__file__).resolve().parents[2] / "extension").rglob("*.js"):
+        txt = f.read_text(encoding="utf-8")
+        bad = re.findall(r"=\s*(?:setInterval|clearInterval|setTimeout|clearTimeout|fetch)\s*[,})\n;]", txt)
+        assert not bad, (f.name, bad)

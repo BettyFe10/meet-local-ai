@@ -225,6 +225,7 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Installazione e avvio del backend | SUPERATO | da foto del Terminale: backend attivo, `gemma4:12b` scelto in automatico e funzionante (risposta di prova 4,4 s) |
 | Modello di sintesi riconosciuto dall'app | FALLITO → corretto (D-055) | il modello era nella cartella standard di Ollama, il backend guardava solo quella del progetto; correzione NON ancora verificata su quel Mac |
 | Microfono | DA CHIARIRE | "Microfono non disponibile" pur con permesso dato; ora il messaggio indica la causa (nessun microfono / permesso / macOS) |
+| Avvio della registrazione dopo l'aggiornamento | FALLITO → corretto | "Impossibile catturare l'audio della scheda Meet": errore introdotto in Fase 15 dal controllo della scheda muta (`setInterval` chiamato come metodo: funziona in Node, non in Chrome). La Fase 15 non era stata provata con una registrazione vera. Correzione NON ancora verificata in Chrome |
 | Icona nella barra dei menu (`installer/menubar.sh`) | NON TESTATA | codice Swift mai compilato finora |
 | Suite automatica | SUPERATO (171, VM Linux) | |
 
