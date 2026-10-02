@@ -12,14 +12,24 @@ Tempo: 15–40 minuti (quasi tutto download). Dopo l'installazione l'app funzion
 
 Provato su: Mac mini M4 16 GB (macOS 26). **Non ancora provato** su altri Mac: vedi TEST_RESULTS.md.
 
-## 1. Scaricare il progetto
+## Metodo semplice (senza git)
+1. Scaricare il programma come file ZIP (dalla pagina GitHub del progetto: **Code → Download ZIP**, oppure ricevendo lo ZIP da un collega) e aprirlo con un doppio clic.
+2. Nella cartella ottenuta, **clic destro** su `Installa Meet Local AI.command` → **Apri** → **Apri**. (Se macOS lo blocca: Impostazioni di Sistema → Privacy e sicurezza → **Apri comunque**.)
+   In alternativa, nel Terminale: `bash ~/Downloads/meet-local-ai-main/"Installa Meet Local AI.command"`
+3. Rispondere `s` alle conferme. Il programma si copia da solo in `~/MeetLocalAI/app`, installa Homebrew se manca (chiede la password del Mac) e poi tutto il resto.
+4. Caricare l'estensione in Chrome: vedi il punto 3 più sotto.
+
+Per aggiornare: scaricare il nuovo ZIP e ripetere il punto 2. Le riunioni non vengono toccate.
+
+## Metodo con git
+### 1. Scaricare il progetto
 ```bash
 mkdir -p ~/MeetLocalAI
 git clone <URL-del-repository-privato> ~/MeetLocalAI/app
 ```
 La cartella deve essere `~/MeetLocalAI/app` (non Scrivania/Documenti/Download: macOS le protegge e l'avvio automatico non funzionerebbe).
 
-## 2. Installare
+### 2. Installare
 ```bash
 cd ~/MeetLocalAI/app && ./install_mac.sh
 ```

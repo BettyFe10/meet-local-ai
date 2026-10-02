@@ -23,6 +23,8 @@ Google Meet → estensione Chrome → backend su 127.0.0.1 → Whisper locale �
 git clone <URL-del-repository> ~/MeetLocalAI/app
 cd ~/MeetLocalAI/app && ./install_mac.sh
 ```
+Senza git: scarica lo ZIP e apri `Installa Meet Local AI.command` (clic destro → Apri).
+
 Poi si carica l'estensione in Chrome (cartella `extension/`). Passo passo: **[SETUP-NEW-COMPUTER.md](SETUP-NEW-COMPUTER.md)**.
 
 ## Documentazione

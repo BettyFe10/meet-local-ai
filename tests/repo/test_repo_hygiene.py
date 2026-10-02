@@ -68,8 +68,9 @@ def test_no_remote_urls_in_extension_code():
 
 
 def test_shell_scripts_are_executable_and_parse():
-    scripts = [p for p in tracked() if p.suffix == ".sh"]
-    assert {"diagnose.sh", "start_backend.sh", "stop_backend.sh", "install_mac.sh", "uninstall_mac.sh"} <= {p.name for p in scripts}
+    scripts = [p for p in tracked() if p.suffix in (".sh", ".command")]
+    assert {"diagnose.sh", "start_backend.sh", "stop_backend.sh", "install_mac.sh", "uninstall_mac.sh",
+            "Installa Meet Local AI.command"} <= {p.name for p in scripts}
     for p in scripts:
         assert os.access(p, os.X_OK), f"{p.name} non eseguibile"
         r = subprocess.run(["bash", "-n", str(p)], capture_output=True, text=True)

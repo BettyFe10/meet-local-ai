@@ -213,6 +213,12 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Documenti presenti, collegamenti interni validi, messaggi fissi nella guida | VM | SUPERATO | |
 | Guida seguita da una persona che non conosce il progetto | — | NON TESTATA | avverrà con il collega |
 
+## Installazione con doppio clic — 2026-10-02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| `Installa Meet Local AI.command`: sintassi, permessi | VM | SUPERATO | |
+| Esecuzione reale (ZIP scaricato, Gatekeeper, copia, Homebrew, installazione) | — | NON TESTATA | prima prova: Mac del collega |
+
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
 Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.
