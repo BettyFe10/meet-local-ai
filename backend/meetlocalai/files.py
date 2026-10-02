@@ -6,6 +6,7 @@ Le riunioni sono normali cartelle: tutto ciò che fa questo modulo si può fare 
 from __future__ import annotations
 
 import logging
+import os
 import shutil
 import subprocess
 import sys
@@ -31,7 +32,8 @@ function run(argv) {
 def trash(folder: Path, fallback_dir: Path) -> str:
     """Sposta la cartella nel Cestino del Mac (recuperabile). Se non è possibile, la sposta in
     <data_root>/Cestino. Ritorna "trash" oppure "fallback". Non cancella mai in modo definitivo."""
-    if sys.platform == "darwin":
+    # MEETLOCALAI_NO_SYSTEM_TRASH=1: usato dai test per non toccare il Cestino vero
+    if sys.platform == "darwin" and not os.environ.get("MEETLOCALAI_NO_SYSTEM_TRASH"):
         try:
             r = subprocess.run(["/usr/bin/osascript", "-l", "JavaScript", "-e", _JXA_TRASH, str(folder)],
                                capture_output=True, text=True, timeout=30)

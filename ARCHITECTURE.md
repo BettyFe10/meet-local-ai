@@ -68,6 +68,7 @@ backend/
     bench_llm.py      benchmark modelli LLM
     processing.py     coda di elaborazione: conversione → trascrizione → file transcript.*
     files.py          Cestino, export md/txt, spazio occupato, pulizia Temp e raw/
+    diagnose.py       diagnostica senza contenuti (usata da diagnose.sh)
     logging_setup.py  RotatingFileHandler in <logs_dir>/backend.log
     messages.py       testi fissi per l'utente
   .venv/              (non versionato) creato da installer/setup_backend.sh

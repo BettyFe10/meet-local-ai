@@ -30,6 +30,12 @@ def write_cfg(tmp_path: Path, override: dict | None = None) -> Path:
     return p
 
 
+@pytest.fixture(autouse=True)
+def no_system_trash(monkeypatch):
+    """I test non devono mai spostare nulla nel Cestino vero del Mac."""
+    monkeypatch.setenv("MEETLOCALAI_NO_SYSTEM_TRASH", "1")
+
+
 @pytest.fixture
 def cfg_path(tmp_path, monkeypatch):
     p = write_cfg(tmp_path)

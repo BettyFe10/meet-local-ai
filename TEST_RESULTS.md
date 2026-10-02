@@ -170,6 +170,21 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | `keep_raw_tracks=false` su riunione reale | Mac | NON TESTATA | |
 | Ripristino dal Cestino e ricomparsa in dashboard | Mac | NON TESTATA | |
 
+## Fase 13 — 2026-10-02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (162 test) | VM Linux (Python 3.10) | SUPERATO | |
+| Suite completa (162 test) | Mac mini M4 (Python 3.12.6) | SUPERATO | prima esecuzione: 3 falliti per errori dei test (Cestino vero disponibile, backend vero acceso) → corretti |
+| Flusso completo via API con FFmpeg vero, Whisper e LLM finti | VM + Mac | SUPERATO | test_e2e.py |
+| Metadata conformi allo schema in ogni stato | VM + Mac | SUPERATO | |
+| Log senza titolo / codice Meet / trascrizione / sintesi; rotazione | VM + Mac | SUPERATO | l'ID riunione compare (limite noto) |
+| Nessun dato personale, chiave o file di dati nel repository | VM + Mac | SUPERATO | test_repo_hygiene.py |
+| `diagnose.sh` | Mac | SUPERATO | "Nessun problema rilevato"; nessun titolo nel rapporto |
+| Riunione reale ≥30 min | Mac | NON TESTATA | |
+| Backend offline durante una registrazione reale | Mac + Chrome | NON TESTATA | coperto solo da test Node dell'uploader |
+| Avvio automatico dopo riavvio del Mac | Mac | NON TESTATA | |
+| Installazione su un altro Mac (M2 Pro 16 GB) | — | NON TESTATA | Fase 14 |
+
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
 Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.

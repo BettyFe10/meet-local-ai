@@ -45,6 +45,7 @@ def test_delete_uses_macos_trash_api(client, monkeypatch):
         shutil.rmtree(cmd[-1])                                     # simula lo spostamento nel Cestino
         return subprocess.CompletedProcess(cmd, 0, "ok", "")
 
+    monkeypatch.delenv("MEETLOCALAI_NO_SYSTEM_TRASH")
     monkeypatch.setattr(sys, "platform", "darwin")
     monkeypatch.setattr(subprocess, "run", fake_run)
     r = client.delete(f"/api/v1/meetings/{mid}", headers=HDR).json()

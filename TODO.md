@@ -26,7 +26,7 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] (U) Creare repo privato `meet-local-ai` su GitHub e fare il primo push (docs/GITHUB.md)
 - [ ] (U) Invitare il collega come collaboratore
 - [ ] Decidere la licenza prima di un'eventuale apertura (D-020)
-- [ ] Fase 13: controllo automatico "nessun dato personale nei file tracciati" nei test
+- [x] Controllo automatico "nessun dato personale nei file tracciati" nei test
 
 ## FASE 3 — Backend minimo ✅
 - [x] (U) Eseguire script di setup Python (venv con python3.12 o 3.13)
@@ -122,14 +122,17 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] Avviso esplicito "disco quasi pieno" in dashboard (oggi: spazio libero mostrato + blocco registrazione sotto 1 GB)
 - [ ] `keep_raw_tracks=false` provato solo nei test automatici — NON TESTATO sul Mac
 
-## FASE 13 — Test completi (PROSSIMA)
-- [ ] Rivedere la copertura: backend, API, filesystem, metadata, trascrizione, sintesi, errori, messaggistica estensione
-- [ ] Controllo automatico "nessun dato personale nei file tracciati"
-- [ ] `diagnose.sh` (stato componenti, senza contenuti delle riunioni)
-- [ ] Log: verifica rotazione e assenza di testo delle riunioni; metriche di prestazione
-- [ ] (U) Prova reale lunga (≥30 min) e backend offline durante la registrazione
+## FASE 13 — Test completi ✅
+- [x] Flusso completo via API, metadata contro lo schema, errori, messaggi fissi
+- [x] Controllo automatico "nessun dato personale nei file tracciati"
+- [x] `diagnose.sh` (senza contenuti delle riunioni) + metriche di prestazione
+- [x] Log: rotazione e assenza del testo delle riunioni
+- [x] (U) Suite eseguita sul Mac: 162 superati
+- [ ] (U) Prova reale lunga (≥30 min) — NON TESTATA
+- [ ] (U) Backend offline durante una registrazione reale — NON TESTATA
+- [ ] Gli ID riunione (con il titolo ripulito) compaiono nei log: valutare un ID anonimo nei log
 
-## FASE 14–16
+## FASE 14–16 (PROSSIMA: 14)
 - [ ] 14 Installer e portabilità (install_mac.sh, uninstall_mac.sh, SETUP-NEW-COMPUTER.md, Mac del collega M2 Pro 16 GB)
 - [ ] 15 UI/UX finale (opzione "qualità massima")
 - [ ] 16 Documentazione

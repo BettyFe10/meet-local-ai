@@ -1,8 +1,17 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-02
-**Fase corrente:** FASE 12 — Gestione file → ✅ COMPLETATA (provata in Chrome sul Mac)
-**Prossima fase:** FASE 13 — Test completi + `diagnose.sh` (NON ANCORA INIZIATA)
+**Fase corrente:** FASE 13 — Test completi → ✅ COMPLETATA (suite e diagnostica eseguite sul Mac)
+**Prossima fase:** FASE 14 — Installer e portabilità (NON ANCORA INIZIATA)
+
+## Fase 13 — cosa è stato fatto
+- Test: **162** (erano 147), eseguiti sia nella VM Linux sia **sul Mac** (Python 3.12.6): tutti superati.
+- `tests/backend/test_e2e.py`: flusso completo via API (avvio → blocchi audio veri con duplicato e buco → stop → trascrizione → sintesi → lettura → export → elimina) con Whisper/LLM finti e FFmpeg vero; metadata validati con `docs/metadata.schema.json` a ogni passo; messaggi utente fissi; errori senza dettagli tecnici; rotazione dei log.
+- Privacy dei log verificata: né titolo, né codice Meet, né trascrizione, né sintesi. Limite noto: l'ID della riunione (che contiene il titolo "ripulito") compare nei log.
+- `tests/repo/test_repo_hygiene.py`: nessun dato personale / chiave / file audio / config locale nei file destinati a git; nessun URL remoto nell'estensione; script `.sh` eseguibili e validi; dipendenze con versione fissa.
+- `diagnose.sh` + `python -m meetlocalai.diagnose [--json]`: stato di backend, FFmpeg, Whisper, LLM, cartelle, spazio, LaunchAgent, Chrome, conteggi riunioni per stato e **metriche di prestazione** medie (fattore tempo reale, tempi di sintesi, RAM Whisper); ultimi errori del log con ID riunione mascherati. Rapporto in `~/MeetLocalAI/Logs/diagnose_report.txt` (fuori dal repo). Sul Mac: "Nessun problema rilevato".
+- I test non usano più il Cestino vero del Mac (`MEETLOCALAI_NO_SYSTEM_TRASH`, D-047). Nella prima esecuzione sul Mac alcune cartelle finte dei test sono finite nel Cestino: eliminabili.
+- NON TESTATE (richiedono una prova reale dell'utente): riunione lunga ≥30 min; backend offline durante una registrazione; avvio automatico dopo riavvio del Mac; Mac del collega.
 
 ## Fase 12 — cosa è stato fatto
 - `files.py`: **Elimina** = spostamento nel **Cestino del Mac** (recuperabile; se il Cestino di sistema non è disponibile → cartella `~/MeetLocalAI/Cestino`), mai cancellazione definitiva (D-044, sostituisce D-016). Rifiutata (409) se la riunione è in registrazione o in elaborazione.
@@ -171,5 +180,5 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 13.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 14.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).
