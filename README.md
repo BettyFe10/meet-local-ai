@@ -65,6 +65,6 @@ backend/.venv/bin/python -m pytest   # test automatici
 I dati (riunioni, modelli, log, configurazione) stanno **fuori dal repository**, in `~/MeetLocalAI/`.
 
 ## Stato
-Tutte le 16 fasi previste sono concluse. Provato su un Mac mini M4 con 16 GB. Non ancora provati: installazione su un secondo Mac, riunioni lunghe reali e alcuni casi d'errore: vedi [docs/LIMITI-NOTI.md](docs/LIMITI-NOTI.md).
+Versione 0.1.0, completa e in uso. Prove effettuate e limiti: [TEST_RESULTS.md](TEST_RESULTS.md), [docs/LIMITI-NOTI.md](docs/LIMITI-NOTI.md).
 
 Licenza: uso interno, nessuna licenza open source assegnata (vedi DECISIONS D-020).
