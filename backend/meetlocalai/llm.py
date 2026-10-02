@@ -58,10 +58,37 @@ def resolve_model(cfg: dict) -> str:
     return recommended_model(system_ram_gb()) if m == "auto" else m
 
 
-def model_on_disk(models_dir: Path, model: str) -> bool:
-    """Verifica senza avviare Ollama: esiste il manifest del modello in <models_dir>/ollama."""
+def default_ollama_dir() -> Path:
+    """Cartella modelli standard di Ollama (usata se sul Mac c'era già Ollama, es. l'app Ollama)."""
+    return Path(os.environ.get("OLLAMA_MODELS") or (Path.home() / ".ollama" / "models"))
+
+
+def _has_manifest(store: Path, model: str) -> bool:
     name, _, tag = model.partition(":")
-    return (models_dir / "ollama" / "manifests" / "registry.ollama.ai" / "library" / name / (tag or "latest")).exists()
+    return (store / "manifests" / "registry.ollama.ai" / "library" / name / (tag or "latest")).exists()
+
+
+def find_model_store(models_dir: Path, model: str) -> Path | None:
+    """Dove si trova il modello su disco: prima nella cartella del progetto, poi in quella standard di Ollama."""
+    for store in (models_dir / "ollama", default_ollama_dir()):
+        if _has_manifest(store, model):
+            return store
+    return None
+
+
+def model_on_disk(models_dir: Path, model: str) -> bool:
+    """Verifica senza avviare Ollama: il modello è presente (cartella del progetto o cartella standard di Ollama)."""
+    return find_model_store(models_dir, model) is not None
+
+
+def server_store(models_dir: Path) -> Path:
+    """Cartella modelli con cui avviare `ollama serve`: quella del progetto, a meno che sia vuota e
+    sul Mac esista già la cartella standard di Ollama con dei modelli (Ollama installato in precedenza)."""
+    own = models_dir / "ollama"
+    default = default_ollama_dir()
+    if not (own / "manifests").exists() and (default / "manifests").exists():
+        return default
+    return own
 
 
 def ollama_rss_mb() -> int:
@@ -122,9 +149,10 @@ class OllamaClient:
         binary = health.which("ollama")
         if not binary:
             raise LLMError("Modello locale non disponibile.", "ollama non installato")
+        store = server_store(self.models_dir)
         env = {**os.environ, "OLLAMA_HOST": urlparse(self.base).netloc,
-               "OLLAMA_MODELS": str(self.models_dir / "ollama"), "OLLAMA_KEEP_ALIVE": self.keep_alive}
-        (self.models_dir / "ollama").mkdir(parents=True, exist_ok=True)
+               "OLLAMA_MODELS": str(store), "OLLAMA_KEEP_ALIVE": self.keep_alive}
+        store.mkdir(parents=True, exist_ok=True)
         self._proc = subprocess.Popen([binary, "serve"], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         deadline = time.time() + wait_s
         while time.time() < deadline:
@@ -223,10 +251,13 @@ def main(argv: list[str]) -> int:
             if model in client.installed_models():
                 print(f"Modello già presente: {model}")
             else:
-                print(f"Scarico {model} in {dirs['models_dir'] / 'ollama'} …", flush=True)
+                print(f"Scarico {model} …", flush=True)
                 client.pull(model)
             r = client.chat(model, "Rispondi solo con: OK", "Test", num_ctx=2048)
             print(f"Modello pronto: {model} (risposta di prova in {r['stats']['total_s']} s)")
+            store = find_model_store(dirs["models_dir"], model)
+            print(f"Cartella dei modelli: {store}" if store else
+                  "[AVVISO] Modello non trovato su disco: Ollama usa una cartella modelli non standard.")
             return 0
         if cmd == "remove":
             if model in client.installed_models():

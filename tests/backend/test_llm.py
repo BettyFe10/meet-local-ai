@@ -154,3 +154,36 @@ def test_fixture_exists_and_has_expected():
     assert bench_llm.FIXTURE.exists()
     exp = json.loads(bench_llm.FIXTURE.with_suffix(".expected.json").read_text())
     assert len(exp["decisioni_attese"]) == 4
+
+
+# ---------- Ollama già presente sul Mac (modelli nella cartella standard) ----------
+def _manifest(store, model="gemma4:12b"):
+    name, tag = model.split(":")
+    p = store / "manifests" / "registry.ollama.ai" / "library" / name
+    p.mkdir(parents=True)
+    (p / tag).write_text("{}")
+
+
+def test_model_found_in_standard_ollama_dir(tmp_path, monkeypatch):
+    std = tmp_path / "std"
+    monkeypatch.setenv("OLLAMA_MODELS", str(std))
+    models = tmp_path / "Models"
+    assert llm.model_on_disk(models, "gemma4:12b") is False
+    _manifest(std)
+    assert llm.model_on_disk(models, "gemma4:12b") is True
+    assert llm.find_model_store(models, "gemma4:12b") == std
+    assert llm.model_on_disk(models, "gemma4:e4b") is False
+    assert llm.server_store(models) == std                     # cartella del progetto vuota → si usa quella standard
+
+
+def test_project_dir_wins_when_it_has_models(tmp_path, monkeypatch):
+    std = tmp_path / "std"
+    monkeypatch.setenv("OLLAMA_MODELS", str(std))
+    models = tmp_path / "Models"
+    _manifest(std)
+    _manifest(models / "ollama", "gemma4:e4b")
+    assert llm.server_store(models) == models / "ollama"
+    assert llm.find_model_store(models, "gemma4:e4b") == models / "ollama"
+    assert llm.server_store(tmp_path / "vuoto" ) == std
+    monkeypatch.setenv("OLLAMA_MODELS", str(tmp_path / "niente"))
+    assert llm.server_store(tmp_path / "vuoto") == tmp_path / "vuoto" / "ollama"

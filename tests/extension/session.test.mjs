@@ -127,3 +127,11 @@ test("avviso se la scheda resta muta, ritirato quando arriva l'audio", async () 
   await s.stop();
   assert.equal(cleared, true);
 });
+
+test("messaggio specifico quando il microfono non si apre", async () => {
+  const { micProblem } = await import("../../extension/lib/session.js");
+  assert.match(micProblem("NotFoundError"), /nessun microfono collegato/);
+  assert.match(micProblem("NotAllowedError"), /Privacy e sicurezza/);
+  assert.match(micProblem("NotReadableError"), /in uso|bloccato/);
+  assert.match(micProblem(undefined), /non è stato possibile/);
+});

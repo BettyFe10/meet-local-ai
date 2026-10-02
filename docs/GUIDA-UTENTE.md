@@ -64,5 +64,12 @@ Il verbale è scritto da un modello automatico: **rileggi sempre decisioni, nomi
 
 Per qualsiasi altro problema: `~/MeetLocalAI/app/diagnose.sh`.
 
+## Accendere e spegnere il backend
+Il backend parte da solo a ogni accesso e a riposo consuma pochissimo. Se vuoi controllarlo tu, installa l'icona nella barra dei menu (una volta):
+```bash
+~/MeetLocalAI/app/installer/menubar.sh install
+```
+In alto a destra compare **MLA 🟢** (acceso) o **MLA ⚪️** (spento): cliccandola puoi accenderlo o spegnerlo. Se è spento l'estensione mostra "Backend offline." e non si può registrare. Dopo uno spegnimento manuale resta spento fino alla prossima accensione o al prossimo accesso al Mac.
+
 ## Dove sono i file
 `~/MeetLocalAI/Meetings/AAAA-MM-GG_HH-MM_Titolo/` contiene `audio.wav`, `transcript.txt`, `transcript.md`, `summary.md`, `metadata.json` e `raw/` (tracce originali). Sono file normali: si possono aprire, copiare e archiviare a mano.

@@ -1,5 +1,6 @@
 import { DEFAULT_PORT, getHealth, getPort, getSettings, setSettings } from "./lib/api.js";
 import { el } from "./lib/ui.js";
+import { micProblem } from "./lib/session.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -8,13 +9,17 @@ function show(text, ok) {
   $("result").className = `small status ${ok ? "ok" : "off"}`;
 }
 
-async function refreshMic() {
+async function refreshMic(problem) {
   let state = "prompt";
   try { state = (await navigator.permissions.query({ name: "microphone" })).state; } catch { /* non supportato */ }
   const el = $("micStatus");
   el.textContent = state === "granted" ? "Microfono abilitato." : state === "denied"
     ? "Microfono bloccato: riabilitalo dalle impostazioni del sito dell'estensione in Chrome." : "Microfono non ancora abilitato.";
   el.className = `small status ${state === "granted" ? "ok" : "off"}`;
+  if (problem) {
+    el.textContent = `Microfono non disponibile: ${micProblem(problem)}`;
+    el.className = "small status off";
+  }
 }
 
 function renderLlm(s) {
@@ -62,10 +67,11 @@ async function init() {
     try {
       const st = await navigator.mediaDevices.getUserMedia({ audio: true });
       st.getTracks().forEach((t) => t.stop());   // serve solo a concedere il permesso
+      refreshMic();
     } catch (e) {
       console.warn("[MeetLocalAI] permesso microfono:", e?.name);
+      refreshMic(e?.name || "errore");
     }
-    refreshMic();
   });
   refreshMic();
 

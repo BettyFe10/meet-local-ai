@@ -219,6 +219,15 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | `Installa Meet Local AI.command`: sintassi, permessi | VM | SUPERATO | |
 | Esecuzione reale (ZIP scaricato, Gatekeeper, copia, Homebrew, installazione) | — | NON TESTATA | prima prova: Mac del collega |
 
+## Prima installazione su un secondo Mac — 2026-10-02 (Mac Studio, 36 GB, Ollama già presente)
+| Test | Esito | Note |
+|---|---|---|
+| Installazione e avvio del backend | SUPERATO | da foto del Terminale: backend attivo, `gemma4:12b` scelto in automatico e funzionante (risposta di prova 4,4 s) |
+| Modello di sintesi riconosciuto dall'app | FALLITO → corretto (D-055) | il modello era nella cartella standard di Ollama, il backend guardava solo quella del progetto; correzione NON ancora verificata su quel Mac |
+| Microfono | DA CHIARIRE | "Microfono non disponibile" pur con permesso dato; ora il messaggio indica la causa (nessun microfono / permesso / macOS) |
+| Icona nella barra dei menu (`installer/menubar.sh`) | NON TESTATA | codice Swift mai compilato finora |
+| Suite automatica | SUPERATO (171, VM Linux) | |
+
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
 Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.

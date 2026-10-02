@@ -30,6 +30,8 @@ Aggiornato: 2026-10-02. Il dettaglio delle prove è in [TEST_RESULTS.md](../TEST
 - Opzioni secondarie degli script (`--models`, `--no-llm`, `--no-autostart`).
 
 ## Tecnici
+- Se sul Mac c'era già Ollama, i modelli di sintesi vengono cercati anche nella sua cartella standard (`~/.ollama/models`). Se un Ollama già aperto usa una cartella modelli diversa da quella in cui si trova il modello scelto, la sintesi fallisce e la riunione resta "Trascritta".
+- Mac senza microfono integrato (Mac mini, Mac Studio): senza un microfono esterno si registra solo l'audio degli altri partecipanti.
 - I log contengono il nome della cartella della riunione (che include il titolo), mai il contenuto.
 - Se Chrome si chiude o l'estensione viene ricaricata durante la registrazione, la riunione risulta "Interrotta": l'audio già inviato resta, il resto è perso.
 - La prima registrazione fatta in sviluppo aveva la traccia della riunione muta per cause non chiarite; da allora c'è l'avviso di scheda muta.

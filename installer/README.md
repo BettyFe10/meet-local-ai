@@ -9,6 +9,7 @@ Sono tutti rilanciabili (installano solo ciò che manca).
 | `setup_whisper.sh [modello]` | FFmpeg, whisper.cpp e modello di trascrizione (predefinito `large-v3-turbo`) |
 | `setup_llm.sh [modello]` | Ollama e modello di sintesi (predefinito: in base alla RAM; es. `setup_llm.sh gemma4:12b`) |
 | `launchagent.sh install\|uninstall\|status` | avvio automatico del backend al login |
+| `menubar.sh install\|uninstall\|status` | icona nella barra dei menu per vedere, accendere e spegnere il backend (facoltativa) |
 | `whisper_benchmark.sh`, `llm_benchmark.sh` | benchmark usati in sviluppo (scaricano modelli: non servono all'uso normale) |
 | `phase1_env_check.sh` | rilevazione dell'ambiente usata nella Fase 1 |
 

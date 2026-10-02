@@ -20,4 +20,4 @@ MODELS="$("$VENV_PY" -m meetlocalai --print-dir models_dir)"
 # pulizia di eventuali download interrotti
 find "$MODELS/ollama/blobs" -name '*-partial*' -delete 2>/dev/null || true
 "$VENV_PY" -m meetlocalai.llm install "$MODEL"
-du -sh "$MODELS/ollama" | awk '{print "Spazio occupato dai modelli LLM:", $1}'
+[ -d "$MODELS/ollama" ] && du -sh "$MODELS/ollama" | awk '{print "Spazio occupato dai modelli LLM:", $1}' || true

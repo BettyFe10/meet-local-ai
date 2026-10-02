@@ -36,6 +36,12 @@ def no_system_trash(monkeypatch):
     monkeypatch.setenv("MEETLOCALAI_NO_SYSTEM_TRASH", "1")
 
 
+@pytest.fixture(autouse=True)
+def isolated_ollama_dir(monkeypatch, tmp_path):
+    """I test non devono dipendere dai modelli Ollama realmente presenti sul Mac."""
+    monkeypatch.setenv("OLLAMA_MODELS", str(tmp_path / "ollama-standard"))
+
+
 @pytest.fixture
 def cfg_path(tmp_path, monkeypatch):
     p = write_cfg(tmp_path)

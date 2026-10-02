@@ -7,6 +7,16 @@ import { ChunkUploader } from "./uploader.js";
 
 export const MIME = "audio/webm;codecs=opus";
 
+// Spiega perché il microfono non si è aperto (il nome dell'errore viene dal browser).
+export function micProblem(name) {
+  if (name === "NotFoundError" || name === "OverconstrainedError") return "nessun microfono collegato a questo Mac.";
+  if (name === "NotAllowedError" || name === "SecurityError") {
+    return "permesso mancante. Abilitalo da Impostazioni dell'estensione e controlla sul Mac: Impostazioni di Sistema → Privacy e sicurezza → Microfono → Google Chrome.";
+  }
+  if (name === "NotReadableError" || name === "AbortError") return "è in uso da un altro programma o bloccato da macOS (Impostazioni di Sistema → Privacy e sicurezza → Microfono → Google Chrome).";
+  return "non è stato possibile aprirlo.";
+}
+
 export class RecorderSession {
   constructor({ meetingId, streamId, tracks = ["tab"], chunkMs = 5000, send, notify = () => {},
                 getUserMedia, MediaRecorderImpl, AudioContextImpl, uploaderOpts = {},
@@ -44,7 +54,7 @@ export class RecorderSession {
         });
         this._addPart("mic", micStream);
       } catch (e) {
-        const w = "Microfono non disponibile: registro solo l'audio della riunione (abilitalo da Impostazioni).";
+        const w = `Microfono non disponibile: ${micProblem(e?.name)} Registro solo l'audio della riunione.`;
         this.warnings.push(w);
         this.notify({ type: "warning", message: w, detail: e?.name });
       }

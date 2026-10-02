@@ -38,6 +38,7 @@ fi
 
 "$REPO/stop_backend.sh" 2>/dev/null || true
 "$REPO/installer/launchagent.sh" uninstall 2>/dev/null || true
+"$REPO/installer/menubar.sh" uninstall 2>/dev/null || true
 pkill -f "ollama serve" 2>/dev/null || true
 
 case "$VENV" in
