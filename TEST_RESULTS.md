@@ -196,6 +196,16 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | `uninstall_mac.sh --models`, `install_mac.sh --no-llm / --no-autostart / --check` su macOS | — | NON TESTATA | solo sintassi e opzioni nei test |
 | Estensione ancora PRONTO dopo la reinstallazione | Mac + Chrome | SUPERATO | confermato dall'utente |
 
+## Fase 15 — 2026-10-02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (168 test) | VM Linux | SUPERATO | sul Mac: non rieseguita dopo questa fase |
+| Impostazioni: scelte per 16 GB e ≥24 GB, salvataggio nel config, rifiuto modelli non validi/cloud | VM | SUPERATO | test_settings.py |
+| Avviso scheda muta (soglia, una sola notifica, ritiro, non cancella altri avvisi) | Node | SUPERATO | |
+| Sezione "Sintesi" visibile con "Automatico" | Mac + Chrome | SUPERATO | utente |
+| Passaggio a "Qualità massima" e sintesi con gemma4:12b | Mac | NON TESTATA | modello non scaricato |
+| Avviso scheda muta in registrazione reale | Mac + Chrome | NON TESTATA | |
+
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
 Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.

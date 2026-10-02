@@ -17,5 +17,5 @@ const client = makeClient(baseUrl);
 export const {
   request, getHealth, listMeetings, getMeeting, getStatus, startMeeting, stopMeeting, renameMeeting, sendChunk,
   getTranscript, getSummary, reprocessMeeting, getAudioToken, audioUrl, openFolder, openDataRoot,
-  deleteMeeting, exportMeeting, getStorage,
+  deleteMeeting, exportMeeting, getStorage, getSettings, setSettings,
 } = client;

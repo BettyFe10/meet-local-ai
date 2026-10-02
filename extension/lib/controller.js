@@ -8,6 +8,7 @@ export const IDLE = Object.freeze({
 });
 
 const BUSY = new Set(["starting", "recording", "stopping"]);
+export const MSG_TAB_SILENT = "Nessun audio dalla riunione finora: controlla che la scheda Meet non sia silenziata.";
 const MSG_CAPTURE = "Impossibile catturare l'audio della scheda Meet.";
 
 export function createController({ api, store, badge, capture, now = () => Date.now(), log = () => {} }) {
@@ -97,6 +98,8 @@ export function createController({ api, store, badge, capture, now = () => Date.
     const s = await getState();
     if (s.state !== "recording" && s.state !== "stopping") return s;
     if (ev.type === "capture-ended") return (await stop()).state;
+    if (ev.type === "tab-silent") return patch({ warning: MSG_TAB_SILENT });
+    if (ev.type === "tab-audio") return s.warning === MSG_TAB_SILENT ? patch({ warning: null }) : s;
     if (ev.type === "warning") return patch({ warning: ev.message });
     if (ev.type === "error") return patch({ warning: ev.message });
     if (ev.type === "upload") {

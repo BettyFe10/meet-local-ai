@@ -203,6 +203,46 @@ def create_app(cfg: dict | None = None) -> FastAPI:
     def get_storage():
         return files.storage(config_mod.data_dirs(cfg))
 
+    # ---------- impostazioni (solo il modello di sintesi) ----------
+    def _settings() -> dict:
+        from . import llm  # noqa: PLC0415
+        models_dir = config_mod.data_dirs(cfg)["models_dir"]
+        ram = llm.system_ram_gb()
+        recommended = llm.recommended_model(ram)
+        best = llm.RAM_TIERS[0][1]
+        setting = (cfg["llm"].get("model") or "auto").strip()
+
+        def choice(value, model, label, note=None):
+            return {"value": value, "model": model, "label": label, "note": note,
+                    "downloaded": llm.model_on_disk(models_dir, model),
+                    "install_command": f"~/MeetLocalAI/app/installer/setup_llm.sh {model}"}
+
+        choices = [choice("auto", recommended, "Automatico (consigliato per questo Mac)")]
+        if best != recommended:
+            choices.append(choice(best, best, "Qualità massima",
+                                  f"Su questo Mac ({ram:.0f} GB di RAM) la sintesi è circa 2–3 volte più lenta e usa più memoria: "
+                                  "chiudi le applicazioni pesanti mentre lavora."))
+        if setting not in [c["value"] for c in choices]:
+            choices.append(choice(setting, setting, f"Personalizzato ({setting})"))
+        return {"ram_gb": round(ram, 1), "llm": {"setting": setting, "model": llm.resolve_model(cfg), "choices": choices}}
+
+    @app.get("/api/v1/settings")
+    def get_settings():
+        return _settings()
+
+    @app.patch("/api/v1/settings")
+    def patch_settings(payload: dict = Body(...)):
+        from . import llm  # noqa: PLC0415
+        value = payload.get("llm_model")
+        allowed = {"auto", *(m for _, m in llm.RAM_TIERS)}
+        if not isinstance(value, str) or value not in allowed or llm.is_cloud_model(value):
+            return JSONResponse(status_code=400, content={"error_code": "invalid_setting",
+                                                          "user_message": "Modello non valido.", "detail_logged": False})
+        config_mod.update_local({"llm": {"model": value}})
+        cfg["llm"]["model"] = value          # stesso dizionario usato dall'elaborazione: vale dalla prossima sintesi
+        log.info("Impostazione modello di sintesi: %s", value)
+        return _settings()
+
     # ---------- Finder ----------
     def _open_in_finder(path) -> JSONResponse | dict:
         import subprocess  # noqa: PLC0415

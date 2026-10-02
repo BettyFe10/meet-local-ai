@@ -1,4 +1,5 @@
-import { DEFAULT_PORT, getHealth, getPort } from "./lib/api.js";
+import { DEFAULT_PORT, getHealth, getPort, getSettings, setSettings } from "./lib/api.js";
+import { el } from "./lib/ui.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -16,7 +17,44 @@ async function refreshMic() {
   el.className = `small status ${state === "granted" ? "ok" : "off"}`;
 }
 
+function renderLlm(s) {
+  const sel = $("llmModel");
+  sel.replaceChildren(...s.llm.choices.map((c) => el("option", { value: c.value }, `${c.label} — ${c.model}`)));
+  sel.value = s.llm.setting;
+  sel.disabled = false;
+  const cur = s.llm.choices.find((c) => c.value === s.llm.setting);
+  $("llmNote").textContent = cur?.note ? `⚠ ${cur.note}` : "";
+  const st = $("llmStatus");
+  if (cur?.downloaded) {
+    st.textContent = "Modello presente su questo Mac.";
+    st.className = "small status ok";
+  } else {
+    st.replaceChildren("Modello non ancora scaricato: finché manca, le riunioni vengono solo trascritte. Per scaricarlo apri il Terminale ed esegui: ",
+      el("code", {}, cur?.install_command || ""));
+    st.className = "small status off";
+  }
+}
+
+async function initLlm() {
+  try {
+    renderLlm(await getSettings());
+  } catch (e) {
+    $("llmStatus").textContent = e.userMessage;
+    $("llmStatus").className = "small status off";
+    return;
+  }
+  $("llmModel").addEventListener("change", async () => {
+    try {
+      renderLlm(await setSettings({ llm_model: $("llmModel").value }));
+    } catch (e) {
+      $("llmStatus").textContent = e.userMessage;
+      $("llmStatus").className = "small status off";
+    }
+  });
+}
+
 async function init() {
+  initLlm();
   const { captureMic } = await chrome.storage.local.get({ captureMic: true });
   $("captureMic").checked = captureMic;
   $("captureMic").addEventListener("change", () => chrome.storage.local.set({ captureMic: $("captureMic").checked }));

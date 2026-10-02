@@ -98,3 +98,32 @@ test("backend irraggiungibile allo stop → risultato non ok con blocchi in sosp
   assert.equal(r.ok, false);
   assert.ok(r.tracks.tab.pending > 0);
 });
+
+test("avviso se la scheda resta muta, ritirato quando arriva l'audio", async () => {
+  let level = 0;
+  let tickFn = null;
+  let cleared = false;
+  class CtxWithAnalyser extends FakeAudioContext {
+    createMediaStreamSource() { return { connect: () => {} }; }
+    createAnalyser() { return { fftSize: 0, getFloatTimeDomainData: (buf) => buf.fill(level) }; }
+  }
+  const events = [];
+  const s = new RecorderSession({
+    meetingId: "m", streamId: "S", tracks: ["tab"], send: async () => {}, notify: (e) => events.push(e.type),
+    getUserMedia: async () => new FakeStream(), MediaRecorderImpl: FakeRecorder, AudioContextImpl: CtxWithAnalyser,
+    silenceWarnMs: 6000, silenceCheckMs: 2000,
+    setIntervalImpl: (fn) => { tickFn = fn; return 1; }, clearIntervalImpl: () => { cleared = true; },
+    uploaderOpts: { sleep: async () => {} },
+  });
+  await s.start();
+  tickFn(); tickFn();
+  assert.deepEqual(events.filter((e) => e.startsWith("tab-")), []);          // 4 s: ancora presto
+  tickFn(); tickFn();
+  assert.deepEqual(events.filter((e) => e.startsWith("tab-")), ["tab-silent"]); // una sola volta
+  level = 0.2; tickFn();
+  assert.deepEqual(events.filter((e) => e.startsWith("tab-")), ["tab-silent", "tab-audio"]);
+  level = 0; tickFn(); tickFn();
+  assert.equal(events.filter((e) => e === "tab-silent").length, 1);           // il conteggio riparte da zero
+  await s.stop();
+  assert.equal(cleared, true);
+});

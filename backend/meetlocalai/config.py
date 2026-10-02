@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import ipaddress
 import json
+import os
 import logging
 import shutil
 from pathlib import Path
@@ -78,6 +79,18 @@ def load(path: Path | None = None, create_if_missing: bool = True) -> dict[str, 
     cfg = validate(_deep_merge(defaults, user))
     cfg["_config_path"] = str(path)
     return cfg
+
+
+def update_local(changes: dict, path: Path | None = None) -> None:
+    """Scrive alcune chiavi nel config locale (le altre restano come sono). Valida prima di salvare; scrittura atomica."""
+    path = path or paths.config_path()
+    defaults = json.loads(paths.EXAMPLE_CONFIG.read_text(encoding="utf-8"))
+    user = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    merged = _deep_merge(user, changes)
+    validate(_deep_merge(defaults, merged))
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(merged, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
 
 
 def data_dirs(cfg: dict) -> dict[str, Path]:

@@ -156,3 +156,15 @@ test("resync: backend offline → stato invariato", async () => {
   await ctrl.resync();
   assert.equal(getState().state, "recording");
 });
+
+test("scheda muta → avviso; audio tornato → avviso rimosso (senza cancellare altri avvisi)", async () => {
+  const { ctrl, getState } = setup();
+  await ctrl.start(START);
+  await ctrl.onCaptureEvent({ type: "tab-silent" });
+  assert.match(getState().warning, /Nessun audio dalla riunione/);
+  await ctrl.onCaptureEvent({ type: "tab-audio" });
+  assert.equal(getState().warning, null);
+  await ctrl.onCaptureEvent({ type: "upload", state: "offline" });
+  await ctrl.onCaptureEvent({ type: "tab-audio" });
+  assert.match(getState().warning, /Backend offline/);
+});

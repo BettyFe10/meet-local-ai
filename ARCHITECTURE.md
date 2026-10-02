@@ -123,6 +123,7 @@ Impostazioni leggere in `chrome.storage.local`; impostazioni di elaborazione nel
 | POST | `/meetings/{id}/open-folder` | apre la cartella nel Finder |
 | POST | `/open-data-root` | apre `~/MeetLocalAI` nel Finder |
 | DELETE | `/meetings/{id}` | sposta la riunione nel Cestino del Mac (409 se in registrazione/elaborazione) |
+| GET / PATCH | `/settings` | modello di sintesi: lettura e modifica (`{llm_model}`) |
 | GET | `/storage` | spazio occupato per cartella e spazio libero |
 
 Errori: `{error_code, user_message, detail_logged:true}`. Messaggi utente fissi: "Backend offline.", "Whisper locale non disponibile.", "Modello locale non disponibile."; dettagli tecnici solo nei log.

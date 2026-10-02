@@ -60,6 +60,8 @@ export function makeClient(getBaseUrl, fetchImpl = (...a) => fetch(...a)) {
     reprocessMeeting: (id, steps) => request(`/meetings/${enc(id)}/reprocess`, { method: "POST", body: steps ? { steps } : {} }),
     deleteMeeting: (id) => request(`/meetings/${enc(id)}`, { method: "DELETE", timeoutMs: 35000 }),
     exportMeeting: (id, format) => request(`/meetings/${enc(id)}/export?format=${format}`, { as: "text", timeoutMs: 15000 }),
+    getSettings: () => request("/settings", { timeoutMs: 8000 }),
+    setSettings: (changes) => request("/settings", { method: "PATCH", body: changes, timeoutMs: 8000 }),
     getStorage: () => request("/storage", { timeoutMs: 15000 }),
     getAudioToken: (id) => request(`/meetings/${enc(id)}/audio-token`, { method: "POST" }),
     audioUrl: async (id, token) => `${await getBaseUrl()}/meetings/${enc(id)}/audio?token=${enc(token)}`,

@@ -140,12 +140,14 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] Installazione su Mac "vuoto" (senza Homebrew/Python) — NON TESTATA
 - [ ] Lock completo delle dipendenze transitive
 
-## FASE 15 — UI/UX finale (PROSSIMA)
-- [ ] Opzione "qualità massima" (gemma4:12b) nelle impostazioni con avviso RAM/tempi
-- [ ] Avviso "disco quasi pieno"; avviso traccia muta durante la registrazione
-- [ ] Revisione testi, stati vuoti, messaggi d'errore, accessibilità di base
+## FASE 15 — UI/UX finale ✅
+- [x] Opzione "qualità massima" (gemma4:12b) nelle impostazioni con avviso RAM/tempi
+- [x] Avviso traccia muta durante la registrazione; avviso disco quasi pieno (Fase 12)
+- [x] Accessibilità di base degli avvisi
+- [ ] (U) Cambio modello dal vivo e sintesi con gemma4:12b — NON TESTATO
+- [ ] (U) Avviso scheda muta in una registrazione reale — NON TESTATO
 
-## FASE 16 — Documentazione
+## FASE 16 — Documentazione (PROSSIMA)
 - [ ] README finale, guida utente, limiti noti, privacy
 
 ## Installazioni previste (NON ancora eseguite)

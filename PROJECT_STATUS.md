@@ -1,8 +1,17 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-02
-**Fase corrente:** FASE 14 — Installer e portabilità → ✅ COMPLETATA sul Mac di sviluppo (installazione su un Mac nuovo: NON TESTATA)
-**Prossima fase:** FASE 15 — UI/UX finale (NON ANCORA INIZIATA)
+**Fase corrente:** FASE 15 — UI/UX finale → ✅ COMPLETATA (sezione Sintesi vista in Chrome; cambio modello e avviso scheda muta NON TESTATI dal vivo)
+**Prossima fase:** FASE 16 — Documentazione (NON ANCORA INIZIATA) — ultima fase
+
+## Fase 15 — cosa è stato fatto
+- Impostazioni → **Sintesi**: scelta del modello ("Automatico (consigliato per questo Mac)" / "Qualità massima" gemma4:12b con avviso su tempi e memoria sotto i 24 GB). Mostra se il modello è presente; se manca, il comando per scaricarlo. Salvata nel config locale (solo `llm.model`), vale dalla prossima sintesi.
+- API: `GET /settings`, `PATCH /settings {"llm_model"}` (solo "auto" o i modelli previsti; modelli cloud e nomi sconosciuti rifiutati).
+- **Avviso scheda muta** durante la registrazione: se dalla scheda Meet non arriva suono per 45 s il popup avvisa; l'avviso si ritira quando arriva l'audio. Si misura solo il livello.
+- Accessibilità: errori/avvisi del popup annunciati (`role="alert"` / `aria-live`).
+- Avviso "spazio quasi esaurito" già presente in dashboard dalla Fase 12.
+- Test: 168.
+- Prova utente: la sezione Sintesi mostra "Automatico (consigliato per questo Mac)". NON TESTATI dal vivo: passaggio a "Qualità massima" (modello gemma4:12b non scaricato: ~8 GB, disco con ~12 GB liberi), avviso di scheda muta in una registrazione reale.
 
 ## Fase 14 — cosa è stato fatto
 - `install_mac.sh` (radice): controllo del Mac (Apple Silicon, RAM → modello, spazio, Homebrew, Chrome, porta, Python, cartella non protetta), conferma, poi `setup_backend.sh` → `setup_whisper.sh` → `setup_llm.sh` → `launchagent.sh install` → `diagnose.sh` → istruzioni per caricare l'estensione. Idempotente. Opzioni `--check`, `--yes`, `--no-llm`, `--no-autostart`.
@@ -189,5 +198,5 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 15.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 16.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).
