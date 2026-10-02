@@ -135,3 +135,31 @@ test("messaggio specifico quando il microfono non si apre", async () => {
   assert.match(micProblem("NotReadableError"), /in uso|bloccato/);
   assert.match(micProblem(undefined), /non è stato possibile/);
 });
+
+test("microfono scelto nelle Impostazioni: usato se c'è, altrimenti si ripiega sul predefinito con avviso", async () => {
+  const run = async (missing) => {
+    const seen = [];
+    const events = [];
+    const s = new RecorderSession({
+      meetingId: "m", streamId: "S", tracks: ["tab", "mic"], micDeviceId: "DEV1", send: async () => {}, notify: (e) => events.push(e),
+      getUserMedia: async (c) => {
+        seen.push(c);
+        if (missing && c.audio.deviceId) { const e = new Error("x"); e.name = "OverconstrainedError"; throw e; }
+        return new FakeStream();
+      },
+      MediaRecorderImpl: FakeRecorder, AudioContextImpl: FakeAudioContext, uploaderOpts: { sleep: async () => {} },
+    });
+    const r = await s.start();
+    await s.stop();
+    return { seen, r };
+  };
+  const ok = await run(false);
+  assert.deepEqual(ok.seen[1].audio.deviceId, { exact: "DEV1" });
+  assert.deepEqual(ok.r.tracks, ["tab", "mic"]);
+  assert.deepEqual(ok.r.warnings, []);
+  const fb = await run(true);
+  assert.equal(fb.seen.length, 3);
+  assert.equal(fb.seen[2].audio.deviceId, undefined);
+  assert.deepEqual(fb.r.tracks, ["tab", "mic"]);
+  assert.match(fb.r.warnings[0], /non è disponibile: uso quello predefinito/);
+});

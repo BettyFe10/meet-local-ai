@@ -14,7 +14,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       if (session) return { ok: false, error: "Registrazione audio già attiva." };
       const client = makeClient(async () => msg.baseUrl);
       session = new RecorderSession({
-        meetingId: msg.meetingId, streamId: msg.streamId, tracks: msg.tracks, chunkMs: msg.chunkMs || 5000,
+        meetingId: msg.meetingId, streamId: msg.streamId, tracks: msg.tracks, chunkMs: msg.chunkMs || 5000, micDeviceId: msg.micDeviceId || null,
         send: client.sendChunk, notify,
         getUserMedia: (c) => navigator.mediaDevices.getUserMedia(c),
         MediaRecorderImpl: MediaRecorder, AudioContextImpl: AudioContext,

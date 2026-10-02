@@ -19,10 +19,10 @@ export function micProblem(name) {
 
 export class RecorderSession {
   constructor({ meetingId, streamId, tracks = ["tab"], chunkMs = 5000, send, notify = () => {},
-                getUserMedia, MediaRecorderImpl, AudioContextImpl, uploaderOpts = {},
+                getUserMedia, MediaRecorderImpl, AudioContextImpl, uploaderOpts = {}, micDeviceId = null,
                 silenceWarnMs = 45000, silenceCheckMs = 2000, // funzioni freccia: nel browser setInterval non può essere chiamato come metodo di un altro oggetto
                 setIntervalImpl = (fn, ms) => setInterval(fn, ms), clearIntervalImpl = (id) => clearInterval(id) }) {
-    Object.assign(this, { meetingId, streamId, tracks, chunkMs, send, notify, getUserMedia, MediaRecorderImpl, AudioContextImpl, uploaderOpts,
+    Object.assign(this, { meetingId, streamId, tracks, chunkMs, send, notify, getUserMedia, MediaRecorderImpl, AudioContextImpl, uploaderOpts, micDeviceId,
                           silenceWarnMs, silenceCheckMs, setIntervalImpl, clearIntervalImpl });
     this.silence = { timer: null, quietMs: 0, warned: false };
     this.parts = {};       // track -> { stream, recorder, uploader, stopped: Promise }
@@ -49,10 +49,20 @@ export class RecorderSession {
 
     if (this.tracks.includes("mic")) {
       try {
-        const micStream = await this.getUserMedia({
-          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-          video: false,
-        });
+        const base = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+        let micStream;
+        try {
+          // microfono scelto nelle Impostazioni (se indicato); altrimenti quello predefinito del sistema
+          micStream = await this.getUserMedia({
+            audio: this.micDeviceId ? { ...base, deviceId: { exact: this.micDeviceId } } : base, video: false });
+        } catch (e) {
+          if (!this.micDeviceId) throw e;
+          // il microfono scelto non c'è più (scollegato): si ripiega su quello predefinito e lo si segnala
+          micStream = await this.getUserMedia({ audio: base, video: false });
+          const w = "Il microfono scelto nelle Impostazioni non è disponibile: uso quello predefinito del Mac.";
+          this.warnings.push(w);
+          this.notify({ type: "warning", message: w, detail: e?.name });
+        }
         this._addPart("mic", micStream);
       } catch (e) {
         const w = `Microfono non disponibile: ${micProblem(e?.name)} Registro solo l'audio della riunione.`;

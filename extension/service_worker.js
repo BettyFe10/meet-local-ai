@@ -32,8 +32,8 @@ const capture = {
         justification: "Registrazione audio della riunione Google Meet avviata dall'utente.",
       });
     }
-    const { chunkSeconds } = await chrome.storage.local.get({ chunkSeconds: 5 });
-    return toOffscreen({ type: "start", meetingId, streamId, tracks, baseUrl: await api.baseUrl(), chunkMs: chunkSeconds * 1000 });
+    const { chunkSeconds, micDeviceId } = await chrome.storage.local.get({ chunkSeconds: 5, micDeviceId: "" });
+    return toOffscreen({ type: "start", meetingId, streamId, tracks, baseUrl: await api.baseUrl(), chunkMs: chunkSeconds * 1000, micDeviceId });
   },
   async stop() {
     if (!(await chrome.offscreen.hasDocument())) return { ok: true, tracks: {} };

@@ -82,7 +82,81 @@ async function initLlm() {
   });
 }
 
+// ---- scelta e prova del microfono ----
+async function loadMicDevices() {
+  const sel = $("micDevice");
+  let devices = [];
+  try { devices = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "audioinput"); } catch { /* non disponibile */ }
+  const named = devices.filter((d) => d.label && d.deviceId && d.deviceId !== "default" && d.deviceId !== "communications");
+  const { micDeviceId } = await chrome.storage.local.get({ micDeviceId: "" });
+  const opts = [el("option", { value: "" }, "Predefinito del Mac")];
+  for (const d of named) opts.push(el("option", { value: d.deviceId }, d.label));
+  if (micDeviceId && !named.some((d) => d.deviceId === micDeviceId)) {
+    opts.push(el("option", { value: micDeviceId }, "Microfono scelto (non collegato ora)"));
+  }
+  sel.replaceChildren(...opts);
+  sel.value = micDeviceId;
+  // i nomi dei microfoni sono visibili solo dopo aver dato il permesso
+  sel.disabled = named.length === 0;
+  $("testMic").disabled = named.length === 0;
+  if (named.length === 0) $("micTest").textContent = "Per scegliere il microfono premi prima \"Abilita microfono\".";
+  else if ($("micTest").textContent.startsWith("Per scegliere")) $("micTest").textContent = "";
+}
+
+let micTestStop = null;
+async function testMic() {
+  if (micTestStop) return micTestStop();
+  const id = $("micDevice").value;
+  const out = $("micTest");
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: id ? { deviceId: { exact: id } } : true });
+  } catch (e) {
+    out.textContent = `Microfono non disponibile: ${micProblem(e?.name)}`;
+    out.className = "small status off";
+    return;
+  }
+  const ctx = new AudioContext();
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 2048;
+  ctx.createMediaStreamSource(stream).connect(analyser);
+  const buf = new Float32Array(analyser.fftSize);
+  let max = 0;
+  $("micLevel").hidden = false;
+  $("testMic").textContent = "Ferma prova";
+  out.textContent = "Parla per qualche secondo…";
+  out.className = "small muted";
+  const timer = setInterval(() => {
+    analyser.getFloatTimeDomainData(buf);
+    let peak = 0;
+    for (let i = 0; i < buf.length; i++) { const v = Math.abs(buf[i]); if (v > peak) peak = v; }
+    max = Math.max(max, peak);
+    $("micLevel").value = Math.min(1, peak * 3);
+  }, 100);
+  const auto = setTimeout(() => micTestStop && micTestStop(), 8000);
+  micTestStop = () => {
+    clearInterval(timer);
+    clearTimeout(auto);
+    stream.getTracks().forEach((t) => t.stop());
+    ctx.close().catch(() => {});
+    $("micLevel").hidden = true;
+    $("testMic").textContent = "Prova microfono";
+    micTestStop = null;
+    if (max > 0.02) {
+      out.textContent = "Il microfono funziona: la voce arriva.";
+      out.className = "small status ok";
+    } else {
+      out.textContent = "Nessun suono da questo microfono: scegline un altro dall'elenco (i microfoni \"virtuali\" di altre app spesso restano muti).";
+      out.className = "small status off";
+    }
+  };
+}
+
 async function init() {
+  $("micDevice").addEventListener("change", () => chrome.storage.local.set({ micDeviceId: $("micDevice").value }));
+  $("testMic").addEventListener("click", testMic);
+  navigator.mediaDevices.addEventListener?.("devicechange", loadMicDevices);
+  loadMicDevices();
   initLlm();
   const { captureMic } = await chrome.storage.local.get({ captureMic: true });
   $("captureMic").checked = captureMic;
@@ -92,6 +166,7 @@ async function init() {
       const st = await navigator.mediaDevices.getUserMedia({ audio: true });
       st.getTracks().forEach((t) => t.stop());   // serve solo a concedere il permesso
       refreshMic();
+      loadMicDevices();
     } catch (e) {
       console.warn("[MeetLocalAI] permesso microfono:", e?.name);
       refreshMic(e?.name || "errore");

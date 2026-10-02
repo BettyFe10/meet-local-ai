@@ -238,6 +238,13 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Glossario: effetto reale sulla trascrizione | Mac | NON TESTATA | |
 | Icona nella barra dei menu dopo la correzione dell'SDK | Mac | NON TESTATA | in attesa dell'utente |
 
+## Scelta del microfono — 2026-10-02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Mac del collega: microfono "visto ma muto" | Mac Studio | CAUSA TROVATA dall'utente | microfoni virtuali di altre app come dispositivo predefinito; l'estensione usava sempre il predefinito |
+| Microfono scelto usato in registrazione; ripiego sul predefinito se scollegato | Node | SUPERATO | |
+| Elenco microfoni e "Prova microfono" nelle Impostazioni | Chrome | NON TESTATA | |
+
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
 Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.

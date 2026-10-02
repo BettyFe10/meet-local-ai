@@ -49,7 +49,7 @@ Il verbale è scritto da un modello automatico: **rileggi sempre decisioni, nomi
 
 ## Impostazioni
 - **Porta** del backend (di norma non va toccata).
-- **Microfono**: permesso e interruttore "Registra anche il mio microfono".
+- **Microfono**: permesso, interruttore "Registra anche il mio microfono", **scelta del microfono** e pulsante **Prova microfono** (mostra se la voce arriva). Se sul Mac ci sono microfoni "virtuali" di altre applicazioni, quello predefinito può essere muto: scegli dall'elenco quello vero.
 - **Glossario**: nomi di persone, prodotti, sigle e termini che la trascrizione sbaglia spesso, uno per riga e scritti nel modo corretto. È un suggerimento per il riconoscimento, non una sostituzione automatica: aiuta, ma non garantisce. Vale dalla prossima trascrizione, o subito con **Rielabora** su una riunione già registrata. Metti in alto i più importanti: oltre un certo numero (circa 700 caratteri in tutto) gli ultimi non vengono usati.
 - **Sintesi**: "Automatico" sceglie il modello adatto alla RAM del Mac; "Qualità massima" usa un modello più grande, più lento, da scaricare a parte (la pagina mostra il comando).
 

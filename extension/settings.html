@@ -26,6 +26,13 @@
     <div class="actions">
       <button class="btn inline" id="grantMic">Abilita microfono</button>
     </div>
+    <label for="micDevice">Quale microfono usare</label>
+    <select id="micDevice" disabled></select>
+    <div class="actions">
+      <button class="btn inline" id="testMic" disabled>Prova microfono</button>
+      <meter id="micLevel" min="0" max="1" value="0" hidden></meter>
+    </div>
+    <div id="micTest" class="small muted" role="status" aria-live="polite"></div>
     <div id="micStatus" class="small"></div>
   </div>
   <h2>Sintesi</h2>
