@@ -128,6 +128,66 @@ def create_app(cfg: dict | None = None) -> FastAPI:
         queued = processor.enqueue(meeting_id, "summary" if only_summary else "full")
         return {"queued": queued, "queue_length": processor.status()["queue_length"]}
 
+    # ---------- audio (token temporaneo per il tag <audio>) ----------
+    audio_tokens: dict[str, tuple[str, float]] = {}
+
+    @app.post("/api/v1/meetings/{meeting_id}/audio-token")
+    def post_audio_token(meeting_id: str):
+        import secrets  # noqa: PLC0415
+        try:
+            md = meetings.get_meeting(meetings_dir, meeting_id)
+        except meetings.MeetingNotFound:
+            return _not_found()
+        if not (meetings_dir / md["id"] / "audio.wav").exists():
+            return JSONResponse(status_code=404, content={"error_code": "audio_not_ready",
+                                                          "user_message": "Audio non ancora disponibile.", "detail_logged": False})
+        now_t = time.time()
+        for t in [t for t, (_, exp) in audio_tokens.items() if exp < now_t]:
+            audio_tokens.pop(t, None)
+        token = secrets.token_urlsafe(24)
+        audio_tokens[token] = (md["id"], now_t + 4 * 3600)
+        return {"token": token, "expires_in": 4 * 3600}
+
+    @app.get("/api/v1/meetings/{meeting_id}/audio")
+    def get_audio(meeting_id: str, request: Request, token: str | None = None):
+        from fastapi.responses import FileResponse  # noqa: PLC0415
+        if request.headers.get("x-meetlocalai") != "1":
+            entry = audio_tokens.get(token or "")
+            if not entry or entry[0] != meeting_id or entry[1] < time.time():
+                return JSONResponse(status_code=403, content={"error_code": "invalid_token",
+                                                              "user_message": messages.FORBIDDEN, "detail_logged": False})
+        try:
+            md = meetings.get_meeting(meetings_dir, meeting_id)
+        except meetings.MeetingNotFound:
+            return _not_found()
+        f = meetings_dir / md["id"] / "audio.wav"
+        if not f.exists():
+            return JSONResponse(status_code=404, content={"error_code": "audio_not_ready",
+                                                          "user_message": "Audio non ancora disponibile.", "detail_logged": False})
+        return FileResponse(f, media_type="audio/wav", filename=f"{md['id']}.wav", content_disposition_type="inline")
+
+    # ---------- Finder ----------
+    def _open_in_finder(path) -> JSONResponse | dict:
+        import subprocess  # noqa: PLC0415
+        import sys  # noqa: PLC0415
+        if sys.platform != "darwin":
+            return JSONResponse(status_code=501, content={"error_code": "not_supported",
+                                                          "user_message": "Funzione disponibile solo su macOS.", "detail_logged": False})
+        subprocess.Popen(["/usr/bin/open", str(path)])
+        return {"opened": True}
+
+    @app.post("/api/v1/meetings/{meeting_id}/open-folder")
+    def post_open_folder(meeting_id: str):
+        try:
+            md = meetings.get_meeting(meetings_dir, meeting_id)
+        except meetings.MeetingNotFound:
+            return _not_found()
+        return _open_in_finder(meetings_dir / md["id"])
+
+    @app.post("/api/v1/open-data-root")
+    def post_open_data_root():
+        return _open_in_finder(config_mod.data_dirs(cfg)["data_root"])
+
     @app.get("/api/v1/meetings/{meeting_id}/summary")
     def get_summary(meeting_id: str):
         from . import summarize as summ  # noqa: PLC0415

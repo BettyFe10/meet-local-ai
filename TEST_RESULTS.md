@@ -144,6 +144,19 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Riunione reale lunga (≥30 min) end-to-end | — | NON TESTATA | |
 | MacBook Pro M2 Pro 16 GB (collega) | — | NON TESTATA | |
 
+## Fase 11 — 2026-10-02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (138 test) | VM Linux | SUPERATO | |
+| Audio: senza header né token → 403; token valido → 200; token di un'altra riunione → 403; il token non apre altri endpoint | VM | SUPERATO | |
+| Audio con Range (206, Content-Range) | VM | SUPERATO | |
+| Apri cartella / Apri cartella dati (comando `open`, simulato) | VM | SUPERATO | |
+| Filtro elenco (titolo, data ISO/italiana, stato) | Node | SUPERATO | filter.test.mjs |
+| Dashboard: ricerca, filtro, Apri cartella MeetLocalAI | Mac + Chrome | SUPERATO | utente: "tutto ok" |
+| Lettore audio nella pagina riunione | Mac + Chrome | SUPERATO | utente |
+| Rinomina titolo | Mac + Chrome | SUPERATO | metadata: "RIUNIONE DI TEST 1", cartella invariata |
+| Avanzamento in tempo reale su una nuova registrazione | Mac + Chrome | NON TESTATA | nessuna nuova registrazione fatta |
+
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
 Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.

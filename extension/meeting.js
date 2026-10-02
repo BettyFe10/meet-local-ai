@@ -1,4 +1,4 @@
-import { getMeeting, getSummary, getTranscript, reprocessMeeting } from "./lib/api.js";
+import { audioUrl, getAudioToken, getMeeting, getSummary, getTranscript, openFolder, renameMeeting, reprocessMeeting } from "./lib/api.js";
 import { el, fmtDate, fmtDuration, fmtTime, renderMarkdownLite, statusLabel } from "./lib/ui.js";
 
 const SECTIONS = ["TL;DR", "DECISIONI", "ACTION ITEMS", "PROBLEMI / CRITICITÀ", "INFORMAZIONI IMPORTANTI", "DOMANDE APERTE", "PROSSIMI PASSI"];
@@ -35,6 +35,8 @@ async function load() {
   const hasTranscript = !!m.files?.transcript_txt;
   const hasSummary = !!m.files?.summary_md;
   $("btnTranscript").disabled = !hasTranscript;
+  $("btnAudio").disabled = !m.files?.audio;
+  $("btnFolder").disabled = false;
   $("btnReprocess").hidden = m.status !== "error";
   $("btnSummary").hidden = !(hasTranscript && !BUSY.includes(m.status));
   $("btnSummary").textContent = hasSummary ? "Rigenera sintesi" : "Genera sintesi";
@@ -75,6 +77,47 @@ async function requeue(steps) {
     banner(e.userMessage);
   }
 }
+$("btnAudio").addEventListener("click", async () => {
+  const box = $("audioBox");
+  if (!box.hidden) { $("player").pause(); box.hidden = true; return; }
+  try {
+    if (!$("player").src) {
+      const { token } = await getAudioToken(id);      // token temporaneo: il tag <audio> non può inviare header
+      $("player").src = await audioUrl(id, token);
+    }
+    box.hidden = false;
+  } catch (e) {
+    banner(e.userMessage);
+  }
+});
+
+$("btnFolder").addEventListener("click", async () => {
+  try { await openFolder(id); } catch (e) { banner(e.userMessage); }
+});
+
+function toggleRename(on) {
+  $("renameBox").hidden = !on;
+  $("btnRename").hidden = on;
+  $("title").hidden = on;
+  if (on) { $("renameInput").value = $("title").textContent; $("renameInput").focus(); $("renameInput").select(); }
+}
+$("btnRename").addEventListener("click", () => toggleRename(true));
+$("renameCancel").addEventListener("click", () => toggleRename(false));
+async function saveRename() {
+  const t = $("renameInput").value.trim();
+  if (!t) return;
+  try {
+    const m = await renameMeeting(id, t);
+    $("title").textContent = m.title;
+    document.title = `Meet Local AI — ${m.title}`;
+    toggleRename(false);
+  } catch (e) {
+    banner(e.userMessage);
+  }
+}
+$("renameSave").addEventListener("click", saveRename);
+$("renameInput").addEventListener("keydown", (ev) => { if (ev.key === "Enter") saveRename(); if (ev.key === "Escape") toggleRename(false); });
+
 $("btnSummary").addEventListener("click", () => requeue(["summarize"]));
 $("btnReprocess").addEventListener("click", () => requeue());
 

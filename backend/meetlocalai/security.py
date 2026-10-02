@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import logging
+import re
 
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
@@ -18,6 +19,9 @@ from . import messages
 log = logging.getLogger("meetlocalai.security")
 
 CLIENT_HEADER = "x-meetlocalai"
+# Il tag <audio> del browser non può inviare header: l'audio si scarica con un token temporaneo
+# ottenuto prima tramite una chiamata API normale (con header). Il token viene validato dall'endpoint.
+_AUDIO_PATH_RE = re.compile(r"^/api/v1/meetings/[^/]+/audio$")
 EXT_PREFIX = "chrome-extension://"
 
 
@@ -60,7 +64,9 @@ class SecurityPolicy:
             return _deny("forbidden_origin")
         if request.method == "OPTIONS":
             return Response(status_code=204, headers=self.cors_headers(origin) if origin else {})
-        if request.url.path.startswith("/api/") and request.headers.get(CLIENT_HEADER) != "1":
+        media_with_token = (request.method == "GET" and _AUDIO_PATH_RE.match(request.url.path)
+                            and request.query_params.get("token"))
+        if request.url.path.startswith("/api/") and request.headers.get(CLIENT_HEADER) != "1" and not media_with_token:
             log.warning("Richiesta rifiutata: header %s mancante (%s)", CLIENT_HEADER, request.url.path)
             return _deny("missing_client_header")
         response = await call_next(request)

@@ -8,7 +8,18 @@
     <nav><a href="dashboard.html" class="active">Riunioni</a><a href="settings.html">Impostazioni</a></nav>
   </div>
   <div id="banner"></div>
-  <h2>Riunioni recenti</h2>
+  <div id="processing" class="banner info" hidden></div>
+  <div class="toolbar">
+    <input type="text" id="search" placeholder="Cerca per titolo o data…">
+    <select id="statusFilter">
+      <option value="all">Tutte</option>
+      <option value="done">Pronte</option>
+      <option value="busy">In corso</option>
+      <option value="problem">Con problemi</option>
+    </select>
+    <button class="btn inline" id="openRoot">Apri cartella MeetLocalAI</button>
+  </div>
+  <h2>Riunioni recenti <span id="count" class="muted"></span></h2>
   <table>
     <thead><tr><th>Data</th><th>Ora</th><th>Titolo</th><th>Durata</th><th>Stato</th></tr></thead>
     <tbody id="rows"><tr><td colspan="5" class="empty">Caricamento…</td></tr></tbody>

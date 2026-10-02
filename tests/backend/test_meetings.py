@@ -28,7 +28,8 @@ def test_list_sorted_newest_first_with_summary_fields(client):
     make(mdir(), "2026-09-27_10-30_Nuova", "2026-09-27T10:30:00+02:00", title="Nuova")
     ms = client.get("/api/v1/meetings", headers=HDR).json()["meetings"]
     assert [m["title"] for m in ms] == ["Nuova", "Vecchia"]
-    assert set(ms[0]) == {"id", "title", "created_at", "date", "start_time", "duration_seconds", "status"}
+    assert set(ms[0]) >= {"id", "title", "created_at", "date", "start_time", "duration_seconds", "status",
+                          "has_transcript", "has_summary"}
 
 
 def test_corrupt_or_inconsistent_metadata_is_skipped(client):

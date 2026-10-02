@@ -106,12 +106,20 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] Qualità: temi rimandati a volte omessi; impegni impliciti a volte promossi ad attività → valutare ancora il prompt o gemma4:12b
 - [ ] Provare la sintesi su una riunione reale lunga (≥30 min) — NON TESTATA
 
-## FASE 11 — Dashboard (PROSSIMA)
-- [ ] Elenco riunioni rifinito: ricerca, ordinamento, stato/avanzamento in tempo reale, avvisi
-- [ ] Pagina riunione: player audio (`GET /meetings/{id}/audio` con Range), rinomina titolo, Apri cartella
-- [ ] Indicatore di elaborazione in corso (coda) anche nel popup
+## FASE 11 — Dashboard ✅
+- [x] Elenco: ricerca, filtro per stato, avanzamento in tempo reale, avvisi
+- [x] Pagina riunione: player audio (token + Range), rinomina titolo, Apri cartella
+- [x] Indicatore di elaborazione nel popup
+- [ ] Avanzamento in tempo reale osservato su una registrazione nuova — NON TESTATO dall'utente (solo test automatici)
 
-## FASE 12–16
+## FASE 12 — Gestione file (PROSSIMA)
+- [ ] Esporta Markdown / TXT (verbale + trascrizione) in `Exports/` e download; PDF solo se semplice (stampa del browser)
+- [ ] Eliminazione riunione dall'interfaccia? (D-016: oggi solo dal Finder) → decidere con l'utente; eventuale spostamento nel Cestino
+- [ ] Pulizia: riunioni di prova senza audio, file temporanei, `raw/` facoltativo dopo l'elaborazione (`keep_raw_tracks`)
+- [ ] Spazio occupato (totale e per riunione) visibile in dashboard/impostazioni; avviso se il disco è quasi pieno
+- [ ] Procedura di backup documentata (copia della cartella Meetings)
+
+## FASE 13–16
 - [ ] Vedi ordine fasi nel brief (Trascrizione completa → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
 
 ## Installazioni previste (NON ancora eseguite)

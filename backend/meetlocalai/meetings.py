@@ -13,6 +13,16 @@ ID_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}_[A-Za-z0-9_-]
 LIST_FIELDS = ("id", "title", "created_at", "date", "start_time", "duration_seconds", "status")
 
 
+def _list_item(md: dict) -> dict:
+    item = {k: md.get(k) for k in LIST_FIELDS}
+    files = md.get("files") or {}
+    item["has_transcript"] = bool(files.get("transcript_txt"))
+    item["has_summary"] = bool(files.get("summary_md"))
+    item["warnings"] = len(md.get("warnings") or [])
+    item["error_message"] = (md.get("error") or {}).get("user_message") if md.get("status") == "error" else None
+    return item
+
+
 class MeetingNotFound(Exception):
     pass
 
@@ -40,7 +50,7 @@ def list_meetings(meetings_dir: Path) -> list[dict]:
         if folder.is_dir() and ID_RE.match(folder.name):
             md = _read_metadata(folder)
             if md:
-                out.append({k: md.get(k) for k in LIST_FIELDS})
+                out.append(_list_item(md))
     out.sort(key=lambda m: (m.get("created_at") or "", m["id"]), reverse=True)
     return out
 

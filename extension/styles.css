@@ -57,3 +57,10 @@ input[type=text] { width: 100%; padding: 8px 10px; border-radius: 6px; border: 1
 label input[type=checkbox] { margin-right: 6px; }
 .transcript { white-space: pre-wrap; font-family: inherit; font-size: 14px; line-height: 1.55; margin: 0; max-height: 70vh; overflow: auto; }
 .section ul { margin: 4px 0; padding-left: 20px; } .section li { margin: 3px 0; } .section p { margin: 4px 0; }
+.toolbar { display: flex; gap: 8px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+.toolbar input[type=text] { flex: 1; min-width: 200px; }
+select { padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: 13px; }
+.titlebox { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
+.titlebox input[type=text] { width: 320px; }
+button.link { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; padding: 0; }
+audio { width: 100%; }

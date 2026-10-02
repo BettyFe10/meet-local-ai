@@ -24,6 +24,23 @@ export const STATUS_LABELS = {
 
 export function statusLabel(s) { return STATUS_LABELS[s] || s || "—"; }
 
+export const STEP_LABELS = { converting: "conversione audio", transcribing: "trascrizione", summarizing: "sintesi" };
+
+// Filtro dell'elenco riunioni: testo libero su titolo/data + stato.
+export function filterMeetings(meetings, query = "", status = "all") {
+  const q = query.trim().toLowerCase();
+  const groups = {
+    done: ["completed", "transcribed"],
+    busy: ["recording", "stopped", "converting", "transcribing", "summarizing"],
+    problem: ["error", "interrupted"],
+  };
+  return meetings.filter((m) => {
+    if (status !== "all" && !(groups[status] || []).includes(m.status)) return false;
+    if (!q) return true;
+    return `${m.title} ${m.date} ${fmtDate(m.created_at)}`.toLowerCase().includes(q);
+  });
+}
+
 export function fmtDate(iso) {
   const d = new Date(iso);
   return isNaN(d) ? "—" : d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" });

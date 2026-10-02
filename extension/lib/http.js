@@ -58,6 +58,10 @@ export function makeClient(getBaseUrl, fetchImpl = (...a) => fetch(...a)) {
     getTranscript: (id, format = "txt") => request(`/meetings/${enc(id)}/transcript?format=${format}`, { as: "text", timeoutMs: 10000 }),
     getSummary: (id) => request(`/meetings/${enc(id)}/summary`, { timeoutMs: 10000 }),
     reprocessMeeting: (id, steps) => request(`/meetings/${enc(id)}/reprocess`, { method: "POST", body: steps ? { steps } : {} }),
+    getAudioToken: (id) => request(`/meetings/${enc(id)}/audio-token`, { method: "POST" }),
+    audioUrl: async (id, token) => `${await getBaseUrl()}/meetings/${enc(id)}/audio?token=${enc(token)}`,
+    openFolder: (id) => request(`/meetings/${enc(id)}/open-folder`, { method: "POST" }),
+    openDataRoot: () => request("/open-data-root", { method: "POST" }),
     renameMeeting: (id, title) => request(`/meetings/${enc(id)}`, { method: "PATCH", body: { title } }),
     sendChunk: (id, track, seq, blob) =>
       request(`/meetings/${enc(id)}/chunks?track=${enc(track)}&seq=${seq}`,

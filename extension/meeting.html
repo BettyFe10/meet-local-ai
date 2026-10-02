@@ -4,7 +4,15 @@
 <body>
 <div class="page">
   <div class="topbar">
-    <h1 id="title">Riunione</h1>
+    <div class="titlebox">
+      <h1 id="title">Riunione</h1>
+      <button class="link" id="btnRename" title="Rinomina">✎ Rinomina</button>
+      <span id="renameBox" hidden>
+        <input type="text" id="renameInput" maxlength="200">
+        <button class="btn inline" id="renameSave">Salva</button>
+        <button class="btn inline" id="renameCancel">Annulla</button>
+      </span>
+    </div>
     <nav><a href="dashboard.html">← Riunioni</a><a href="settings.html">Impostazioni</a></nav>
   </div>
   <div id="banner"></div>
@@ -16,6 +24,7 @@
     <button class="btn inline" id="btnSummary" hidden>Genera sintesi</button>
     <button class="btn inline" id="btnReprocess" hidden>Rielabora</button>
   </div>
+  <div id="audioBox" class="card" hidden><h3>Audio</h3><audio id="player" controls preload="metadata"></audio></div>
   <div id="transcriptBox" class="card" hidden><h3>Trascrizione</h3><pre id="transcript" class="transcript"></pre></div>
   <div id="warnings" class="small muted"></div>
   <div id="sections"></div>

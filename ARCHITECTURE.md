@@ -114,7 +114,8 @@ Impostazioni leggere in `chrome.storage.local`; impostazioni di elaborazione nel
 | PATCH | `/meetings/{id}` | `{title}` |
 | GET | `/meetings/{id}/summary` | `{markdown, sections, model}` |
 | GET | `/meetings/{id}/transcript?format=txt\|md` | testo |
-| GET | `/meetings/{id}/audio` | `audio/wav`, supporta HTTP Range |
+| POST | `/meetings/{id}/audio-token` | token temporaneo per il lettore audio |
+| GET | `/meetings/{id}/audio?token=` | `audio/wav`, supporta HTTP Range (header oppure token) |
 | GET | `/meetings/{id}/export?format=md\|txt` | download; copia anche in `Exports/` |
 | POST | `/meetings/{id}/reprocess` | rimette in coda; `{"steps":["summarize"]}` = solo sintesi |
 | POST | `/meetings/{id}/open-folder` | apre la cartella nel Finder |

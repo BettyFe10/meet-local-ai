@@ -1,8 +1,16 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-02
-**Fase corrente:** FASE 9 ✅ e FASE 10 ✅ — LLM locale e sintesi automatica (verificate sul Mac)
-**Prossima fase:** FASE 11 — Dashboard (NON ANCORA INIZIATA)
+**Fase corrente:** FASE 11 — Dashboard → ✅ COMPLETATA (provata in Chrome sul Mac)
+**Prossima fase:** FASE 12 — Gestione file (NON ANCORA INIZIATA)
+
+## Fase 11 — cosa è stato fatto
+- Backend: `GET /meetings/{id}/audio` (WAV con richieste Range) accessibile al tag `<audio>` tramite **token temporaneo** (`POST /meetings/{id}/audio-token`, valido 4 h, legato a quella riunione, in memoria); `POST /meetings/{id}/open-folder` e `POST /open-data-root` (Finder, solo macOS); elenco riunioni con `has_transcript`, `has_summary`, numero avvisi, messaggio d'errore.
+- Dashboard: ricerca per titolo/data, filtro per stato, riga "Elaborazione in corso" (fase e coda), aggiornamento automatico (4 s se c'è lavoro, 20 s altrimenti, fermo se la pagina non è visibile), avvisi/errori sotto lo stato, "Apri cartella MeetLocalAI".
+- Pagina riunione: lettore audio, rinomina titolo (la cartella non cambia nome), "Apri cartella".
+- Popup: indicatore "Elaborazione in corso".
+- Test: 138 (API audio/token/Range/Finder; filtro elenco in Node).
+- Prova utente: "tutto ok" (ricerca, audio, rinomina → titolo "RIUNIONE DI TEST 1" verificato nel metadata, apri cartella).
 
 ## Fase 10 — cosa è stato fatto
 - Modello installato sul Mac: **gemma4:e4b** in `~/MeetLocalAI/Models/ollama` (6,2 GB su disco, ~4,3–6,4 GB di RAM in uso); qwen3:4b residuo rimosso.
@@ -152,5 +160,5 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 11.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 12.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).

@@ -1,5 +1,5 @@
-import { getHealth, MSG_OFFLINE } from "./lib/api.js";
-import { el, fmtClock, meetCodeFromUrl, openExtensionPage } from "./lib/ui.js";
+import { getHealth, getStatus, MSG_OFFLINE } from "./lib/api.js";
+import { el, fmtClock, meetCodeFromUrl, openExtensionPage, STEP_LABELS } from "./lib/ui.js";
 
 const $ = (id) => document.getElementById(id);
 let timerHandle = null;
@@ -104,6 +104,17 @@ async function init() {
     $("hint").replaceChildren("Avvia il backend dal Terminale: ", el("code", {}, "~/MeetLocalAI/app/start_backend.sh"));
   }
   await refresh();
+  pollProcessing();
+}
+
+async function pollProcessing() {
+  try {
+    const st = await getStatus();
+    const p = st.processing;
+    $("processing").hidden = !p && !st.queue_length;
+    $("processing").textContent = p ? `⏳ Elaborazione in corso: ${STEP_LABELS[p.step] || p.step}…` : `⏳ ${st.queue_length} riunioni in coda`;
+    if (p || st.queue_length) setTimeout(pollProcessing, 3000);
+  } catch { $("processing").hidden = true; }
 }
 
 init();
