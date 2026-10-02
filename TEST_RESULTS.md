@@ -229,6 +229,15 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Icona nella barra dei menu (`installer/menubar.sh`) | NON TESTATA | codice Swift mai compilato finora |
 | Suite automatica | SUPERATO (171, VM Linux) | |
 
+## Confronto motori di trascrizione e glossario — 2026-10-02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Registrazione reale dopo la correzione del timer (INIZIA → TERMINA → elaborazione) | Mac mini M4 + Chrome | SUPERATO | utente: "sul mio funziona tutto" |
+| `transcription_compare.sh` su RIUNIONE-DI-TEST (68 s, audio mixato) | Mac mini M4 | ESEGUITO | Whisper turbo 6 s · Whisper large-v3 17 s · Parakeet v3 4 s (+20 min di download). Nessun vincitore netto: vedi D-057. Valutazione per lettura dei testi, senza trascrizione di riferimento |
+| Glossario: salvataggio, pulizia, limiti, passaggio a whisper-cli, niente termini nei log | VM | SUPERATO | 175 test |
+| Glossario: effetto reale sulla trascrizione | Mac | NON TESTATA | |
+| Icona nella barra dei menu dopo la correzione dell'SDK | Mac | NON TESTATA | in attesa dell'utente |
+
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
 Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.

@@ -37,6 +37,15 @@
     <div id="llmNote" class="small muted"></div>
     <div id="llmStatus" class="small" role="status" aria-live="polite"></div>
   </div>
+  <h2>Glossario</h2>
+  <div class="card">
+    <p class="small muted">Nomi di persone, prodotti, sigle e termini che la trascrizione sbaglia spesso: uno per riga, scritti nel modo corretto.
+      Sono un suggerimento per il riconoscimento, non una sostituzione automatica. Valgono dalla prossima trascrizione (o con "Rielabora").</p>
+    <label for="glossary">Termini (uno per riga)</label>
+    <textarea id="glossary" rows="8" spellcheck="false" disabled></textarea>
+    <div class="actions"><button class="btn inline" id="saveGlossary" disabled>Salva glossario</button></div>
+    <div id="glossaryStatus" class="small" role="status" aria-live="polite"></div>
+  </div>
   <h2>Informazioni</h2>
   <div class="card small">
     <div>Versione estensione: <span id="version"></span></div>

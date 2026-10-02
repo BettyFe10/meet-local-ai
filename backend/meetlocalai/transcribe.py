@@ -75,17 +75,54 @@ class MlxEngine:
         return [Segment(float(s["start"]), float(s["end"]), s["text"].strip()) for s in r.get("segments", []) if s["text"].strip()]
 
 
+GLOSSARY_MAX_TERMS = 80
+GLOSSARY_MAX_TERM_LEN = 60
+GLOSSARY_PROMPT_MAX_CHARS = 700     # Whisper usa al massimo ~224 token di suggerimento
+GLOSSARY_PREFIX = "Glossario: "
+
+
+def clean_glossary(terms) -> list[str]:
+    """Normalizza l'elenco: stringhe non vuote, senza a capo, senza doppioni, entro i limiti."""
+    out, seen = [], set()
+    for t in terms or []:
+        if not isinstance(t, str):
+            continue
+        t = " ".join(t.replace(",", " ").split())[:GLOSSARY_MAX_TERM_LEN].strip()
+        if t and t.lower() not in seen:
+            seen.add(t.lower())
+            out.append(t)
+        if len(out) >= GLOSSARY_MAX_TERMS:
+            break
+    return out
+
+
+def glossary_prompt(terms) -> str:
+    """Testo passato a Whisper come suggerimento iniziale: orienta la grafia di nomi e termini, non li impone."""
+    terms = clean_glossary(terms)
+    if not terms:
+        return ""
+    text = GLOSSARY_PREFIX
+    used = []
+    for t in terms:
+        if len(text) + len(t) + 2 > GLOSSARY_PROMPT_MAX_CHARS:
+            break
+        used.append(t)
+        text = GLOSSARY_PREFIX + ", ".join(used) + "."
+    return text if used else ""
+
+
 VAD_MODELS = ("ggml-silero-v6.2.0.bin", "ggml-silero-v5.1.2.bin")
 
 
 class WhisperCppEngine:
     name = "whispercpp"
 
-    def __init__(self, model: str, models_dir: Path, threads: int = 4, vad: bool = True):
+    def __init__(self, model: str, models_dir: Path, threads: int = 4, vad: bool = True, glossary=None):
         self.model = model if model and model != "auto" else DEFAULT_MODELS["whispercpp"]
         self.models_dir = models_dir
         self.threads = threads
         self.vad = vad
+        self.prompt = glossary_prompt(glossary)
 
     def vad_model(self) -> Path | None:
         """Modello Silero VAD (salta i silenzi). Facoltativo e DISATTIVATO di default (D-035):
@@ -119,11 +156,16 @@ class WhisperCppEngine:
             vm = self.vad_model()
             if vm:
                 cmd += ["--vad", "-vm", str(vm)]
+            if self.prompt:
+                cmd += ["--prompt", self.prompt]
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=6 * 3600)
             if r.returncode != 0:
                 log.error("whisper-cli fallito (%s): %s", r.returncode, r.stderr[-800:])
                 raise TranscriptionError("Trascrizione non riuscita.", r.stderr[-800:])
-            return parse_whispercpp_json(json.loads(Path(str(prefix) + ".json").read_text(encoding="utf-8")))
+            segs = parse_whispercpp_json(json.loads(Path(str(prefix) + ".json").read_text(encoding="utf-8")))
+            if self.prompt:   # sul silenzio Whisper può "ripetere" il suggerimento: quelle righe si scartano
+                segs = [s for s in segs if not s.text.strip().lower().startswith(GLOSSARY_PREFIX.strip().lower())]
+            return segs
 
 
 def parse_whispercpp_json(data: dict) -> list[Segment]:
@@ -136,11 +178,11 @@ def parse_whispercpp_json(data: dict) -> list[Segment]:
     return out
 
 
-def make_engine(name: str, model: str, models_dir: Path, vad: bool = True):
+def make_engine(name: str, model: str, models_dir: Path, vad: bool = True, glossary=None):
     if name == "mlx":
         return MlxEngine(model, models_dir)
     if name == "whispercpp":
-        return WhisperCppEngine(model, models_dir, vad=vad)
+        return WhisperCppEngine(model, models_dir, vad=vad, glossary=glossary)
     raise ValueError(f"motore sconosciuto: {name}")
 
 
@@ -150,7 +192,8 @@ def select_engine(cfg: dict, models_dir: Path):
     name, model = tc.get("engine", "auto"), tc.get("model", "auto")
     names = ENGINE_ORDER if name == "auto" else (name,)
     for n in names:
-        eng = make_engine(n, model if name != "auto" else "auto", models_dir, vad=tc.get("vad", False))
+        eng = make_engine(n, model if name != "auto" else "auto", models_dir, vad=tc.get("vad", False),
+                          glossary=tc.get("glossary"))
         ok, why = eng.available()
         if ok:
             return eng

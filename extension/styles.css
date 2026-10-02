@@ -73,3 +73,4 @@ audio { width: 100%; }
   .transcript { max-height: none; overflow: visible; }
   .page { max-width: none; padding: 0; }
 }
+textarea { width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel); color: var(--text); font: inherit; font-size: 13px; resize: vertical; }

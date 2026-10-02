@@ -30,7 +30,8 @@
     "detect_language": false,
     "timestamps": true,
     "diarization": "channels",
-    "vad": false
+    "vad": false,
+    "glossary": []
   },
   "llm": {
     "provider": "ollama",

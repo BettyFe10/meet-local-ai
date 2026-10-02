@@ -224,7 +224,11 @@ def create_app(cfg: dict | None = None) -> FastAPI:
                                   "chiudi le applicazioni pesanti mentre lavora."))
         if setting not in [c["value"] for c in choices]:
             choices.append(choice(setting, setting, f"Personalizzato ({setting})"))
-        return {"ram_gb": round(ram, 1), "llm": {"setting": setting, "model": llm.resolve_model(cfg), "choices": choices}}
+        from . import transcribe as tr  # noqa: PLC0415
+        glossary = tr.clean_glossary(cfg.get("transcription", {}).get("glossary"))
+        return {"ram_gb": round(ram, 1), "llm": {"setting": setting, "model": llm.resolve_model(cfg), "choices": choices},
+                "glossary": {"terms": glossary, "max_terms": tr.GLOSSARY_MAX_TERMS,
+                             "used_terms": tr.glossary_prompt(glossary).count(",") + 1 if glossary else 0}}
 
     @app.get("/api/v1/settings")
     def get_settings():
@@ -232,15 +236,33 @@ def create_app(cfg: dict | None = None) -> FastAPI:
 
     @app.patch("/api/v1/settings")
     def patch_settings(payload: dict = Body(...)):
-        from . import llm  # noqa: PLC0415
-        value = payload.get("llm_model")
-        allowed = {"auto", *(m for _, m in llm.RAM_TIERS)}
-        if not isinstance(value, str) or value not in allowed or llm.is_cloud_model(value):
-            return JSONResponse(status_code=400, content={"error_code": "invalid_setting",
-                                                          "user_message": "Modello non valido.", "detail_logged": False})
-        config_mod.update_local({"llm": {"model": value}})
-        cfg["llm"]["model"] = value          # stesso dizionario usato dall'elaborazione: vale dalla prossima sintesi
-        log.info("Impostazione modello di sintesi: %s", value)
+        from . import llm, transcribe as tr  # noqa: PLC0415
+
+        def bad(msg):
+            return JSONResponse(status_code=400, content={"error_code": "invalid_setting", "user_message": msg, "detail_logged": False})
+
+        if "llm_model" not in payload and "glossary" not in payload:
+            return bad("Nessuna impostazione da salvare.")
+        changes: dict = {}
+        if "llm_model" in payload:
+            value = payload["llm_model"]
+            allowed = {"auto", *(m for _, m in llm.RAM_TIERS)}
+            if not isinstance(value, str) or value not in allowed or llm.is_cloud_model(value):
+                return bad("Modello non valido.")
+            changes["llm"] = {"model": value}
+        if "glossary" in payload:
+            raw = payload["glossary"]
+            if not isinstance(raw, list) or not all(isinstance(t, str) for t in raw) or len(raw) > 500:
+                return bad("Glossario non valido.")
+            changes["transcription"] = {"glossary": tr.clean_glossary(raw)}
+        config_mod.update_local(changes)
+        # stesso dizionario usato dall'elaborazione: vale dalla prossima trascrizione/sintesi
+        if "llm" in changes:
+            cfg["llm"]["model"] = changes["llm"]["model"]
+            log.info("Impostazione modello di sintesi: %s", changes["llm"]["model"])
+        if "transcription" in changes:
+            cfg.setdefault("transcription", {})["glossary"] = changes["transcription"]["glossary"]
+            log.info("Glossario aggiornato: %d termini", len(changes["transcription"]["glossary"]))   # mai i termini nei log
         return _settings()
 
     # ---------- Finder ----------

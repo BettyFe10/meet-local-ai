@@ -29,6 +29,8 @@ Aggiornato: 2026-10-02. Il dettaglio delle prove è in [TEST_RESULTS.md](../TEST
 - Opzione **"Qualità massima"** usata davvero; **avviso di scheda muta** in una riunione reale; **Stampa / PDF**; ripristino di una riunione dal Cestino.
 - Opzioni secondarie degli script (`--models`, `--no-llm`, `--no-autostart`).
 
+- **Glossario**: orienta la grafia di nomi e termini ma non la impone; in rari casi Whisper può inserire un termine del glossario dove non è stato detto. Non corregge frasi poco udibili o voci sovrapposte.
+
 ## Tecnici
 - Se sul Mac c'era già Ollama, i modelli di sintesi vengono cercati anche nella sua cartella standard (`~/.ollama/models`). Se un Ollama già aperto usa una cartella modelli diversa da quella in cui si trova il modello scelto, la sintesi fallisce e la riunione resta "Trascritta".
 - Mac senza microfono integrato (Mac mini, Mac Studio): senza un microfono esterno si registra solo l'audio degli altri partecipanti.

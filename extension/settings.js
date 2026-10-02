@@ -40,9 +40,33 @@ function renderLlm(s) {
   }
 }
 
+function renderGlossary(s, saved) {
+  const g = s.glossary || { terms: [], max_terms: 0, used_terms: 0 };
+  $("glossary").value = g.terms.join("\n");
+  $("glossary").disabled = false;
+  $("saveGlossary").disabled = false;
+  const st = $("glossaryStatus");
+  let msg = saved ? "Salvato. " : "";
+  msg += g.terms.length ? `${g.terms.length} termini.` : "Nessun termine.";
+  if (g.used_terms < g.terms.length) msg += ` Attenzione: ne vengono usati solo i primi ${g.used_terms} (limite del riconoscimento): metti in alto i più importanti.`;
+  st.textContent = msg;
+  st.className = `small status ${g.used_terms < g.terms.length ? "wait" : "ok"}`;
+}
+
 async function initLlm() {
   try {
-    renderLlm(await getSettings());
+    const s = await getSettings();
+    renderLlm(s);
+    renderGlossary(s, false);
+    $("saveGlossary").addEventListener("click", async () => {
+      const terms = $("glossary").value.split("\n").map((t) => t.trim()).filter(Boolean);
+      try {
+        renderGlossary(await setSettings({ glossary: terms }), true);
+      } catch (e) {
+        $("glossaryStatus").textContent = e.userMessage;
+        $("glossaryStatus").className = "small status off";
+      }
+    });
   } catch (e) {
     $("llmStatus").textContent = e.userMessage;
     $("llmStatus").className = "small status off";
