@@ -20,7 +20,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import audio, health, llm, messages, summarize, transcribe
+from . import audio, files, health, llm, messages, summarize, transcribe
 from .meetings import ID_RE, MeetingNotFound, _read_metadata
 from .recording import iso, now, write_metadata
 
@@ -160,8 +160,13 @@ class Processor:
             self._queued.discard(mid)
             try:
                 self.process(mid, mode)
+            except MeetingNotFound:
+                log.info("Riunione %s non più presente (eliminata): elaborazione saltata", mid)
             except Exception:  # noqa: BLE001 - il worker non deve mai morire
                 log.exception("Errore inatteso elaborando %s", mid)
+
+    def busy_with(self, meeting_id: str) -> bool:
+        return meeting_id in self._queued or bool(self.current and self.current["id"] == meeting_id)
 
     def status(self) -> dict:
         return {"current": self.current, "queue_length": self.q.qsize()}
@@ -253,6 +258,9 @@ class Processor:
                              "peak_rss_mb": _peak_rss_mb(),
                              "disk_bytes": sum(p.stat().st_size for p in folder.rglob("*") if p.is_file())})
             log.info("Riunione %s trascritta: audio %.0f s, trascrizione %.1f s, %d blocchi", meeting_id, dur, tr_s, len(lines))
+            if not self.cfg["audio"].get("keep_raw_tracks", True):
+                freed = files.remove_raw(folder)
+                log.info("Riunione %s: tracce grezze rimosse (%d byte liberati)", meeting_id, freed)
             # 3) sintesi (un suo fallimento non invalida la trascrizione)
             self.current["step"] = "summarizing"
             return self._summarize(folder)

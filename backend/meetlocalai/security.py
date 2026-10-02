@@ -48,7 +48,7 @@ class SecurityPolicy:
         return {
             "Access-Control-Allow-Origin": origin,
             "Vary": "Origin",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, OPTIONS",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
             "Access-Control-Allow-Headers": "Content-Type, X-MeetLocalAI",
             "Access-Control-Max-Age": "600",
         }

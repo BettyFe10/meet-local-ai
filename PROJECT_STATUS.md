@@ -1,8 +1,19 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-02
-**Fase corrente:** FASE 11 — Dashboard → ✅ COMPLETATA (provata in Chrome sul Mac)
-**Prossima fase:** FASE 12 — Gestione file (NON ANCORA INIZIATA)
+**Fase corrente:** FASE 12 — Gestione file → ✅ COMPLETATA (provata in Chrome sul Mac)
+**Prossima fase:** FASE 13 — Test completi + `diagnose.sh` (NON ANCORA INIZIATA)
+
+## Fase 12 — cosa è stato fatto
+- `files.py`: **Elimina** = spostamento nel **Cestino del Mac** (recuperabile; se il Cestino di sistema non è disponibile → cartella `~/MeetLocalAI/Cestino`), mai cancellazione definitiva (D-044, sostituisce D-016). Rifiutata (409) se la riunione è in registrazione o in elaborazione.
+- **Esporta** Markdown / TXT (verbale + trascrizione + dati della riunione): download dal browser e copia in `~/MeetLocalAI/Exports/`. **Stampa / PDF** tramite la stampa del browser con foglio di stile dedicato (nessuna libreria PDF, D-045).
+- Spazio occupato: totale e libero su disco nella dashboard, dimensione nella pagina riunione (`GET /storage`).
+- Pulizia: file temporanei rimossi all'avvio del backend; `raw/` rimosso dopo un'elaborazione riuscita solo se `audio.keep_raw_tracks=false` (default: si conservano).
+- `docs/BACKUP.md`: cosa copiare, backup, spostamento su un altro Mac.
+- API: `DELETE /meetings/{id}`, `GET /meetings/{id}/export?format=md|txt`, `GET /storage`.
+- Test: 147.
+- Prova utente sul Mac: Elimina → "ha spostato nel cestino" (log: 3 riunioni di prova eliminate via Cestino di sistema, nessuna cartella `Cestino` interna); export .md e .txt presenti in `Exports/`. Stampa/PDF: NON confermata esplicitamente dall'utente.
+- In archivio resta solo `2026-10-01_19-27_RIUNIONE-DI-TEST` ("RIUNIONE DI TEST 1").
 
 ## Fase 11 — cosa è stato fatto
 - Backend: `GET /meetings/{id}/audio` (WAV con richieste Range) accessibile al tag `<audio>` tramite **token temporaneo** (`POST /meetings/{id}/audio-token`, valido 4 h, legato a quella riunione, in memoria); `POST /meetings/{id}/open-folder` e `POST /open-data-root` (Finder, solo macOS); elenco riunioni con `has_transcript`, `has_summary`, numero avvisi, messaggio d'errore.
@@ -160,5 +171,5 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 12.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 13.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).

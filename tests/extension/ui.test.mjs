@@ -25,3 +25,12 @@ test("statusLabel", () => {
   assert.equal(statusLabel("completed"), "✓ Completata");
   assert.equal(statusLabel("stopped"), "In coda");
 });
+
+import { fmtBytes } from "../../extension/lib/ui.js";
+test("fmtBytes", () => {
+  assert.equal(fmtBytes(null), "—");
+  assert.equal(fmtBytes(500), "1 KB");
+  assert.equal(fmtBytes(3.3 * 1024 ** 2), "3.3 MB");
+  assert.equal(fmtBytes(115 * 1024 ** 2), "115 MB");
+  assert.equal(fmtBytes(6.2 * 1024 ** 3), "6.2 GB");
+});

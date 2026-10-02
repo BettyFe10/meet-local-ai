@@ -64,3 +64,12 @@ select { padding: 8px; border-radius: 6px; border: 1px solid var(--border); back
 .titlebox input[type=text] { width: 320px; }
 button.link { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; padding: 0; }
 audio { width: 100%; }
+.btn.danger { color: var(--danger); border-color: var(--danger); }
+.spacer { flex: 1; }
+@media print {
+  .noprint, nav, #btnRename, #banner, #warnings { display: none !important; }
+  body { background: #fff; color: #000; }
+  .card { border: none; padding: 4px 0; break-inside: avoid; }
+  .transcript { max-height: none; overflow: visible; }
+  .page { max-width: none; padding: 0; }
+}

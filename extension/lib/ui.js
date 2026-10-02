@@ -107,3 +107,20 @@ export function renderMarkdownLite(md) {
   }
   return frag;
 }
+
+export function fmtBytes(n) {
+  if (n === null || n === undefined) return "—";
+  if (n < 1024 ** 2) return `${Math.max(1, Math.round(n / 1024))} KB`;
+  if (n < 1024 ** 3) return `${(n / 1024 ** 2).toFixed(n < 10 * 1024 ** 2 ? 1 : 0)} MB`;
+  return `${(n / 1024 ** 3).toFixed(1)} GB`;
+}
+
+// Salva un testo come file tramite il browser (nessun invio in rete: il contenuto è già nella pagina).
+export function downloadText(filename, text, mime = "text/plain") {
+  const url = URL.createObjectURL(new Blob([text], { type: `${mime};charset=utf-8` }));
+  const a = el("a", { href: url, download: filename });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}

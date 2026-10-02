@@ -17,13 +17,26 @@
   </div>
   <div id="banner"></div>
   <div class="meta"><span id="date">—</span><span id="duration">—</span><span id="status">—</span></div>
-  <div class="actions">
+  <div class="actions noprint">
     <button class="btn inline" id="btnTranscript" disabled>Trascrizione</button>
     <button class="btn inline" id="btnAudio" disabled>Audio</button>
     <button class="btn inline" id="btnFolder" disabled>Apri cartella</button>
     <button class="btn inline" id="btnSummary" hidden>Genera sintesi</button>
     <button class="btn inline" id="btnReprocess" hidden>Rielabora</button>
   </div>
+  <div class="actions noprint">
+    <button class="btn inline" id="btnExportMd">Esporta Markdown</button>
+    <button class="btn inline" id="btnExportTxt">Esporta TXT</button>
+    <button class="btn inline" id="btnPrint">Stampa / PDF</button>
+    <span class="spacer"></span>
+    <button class="btn inline danger" id="btnDelete">Elimina</button>
+  </div>
+  <div id="confirmDelete" class="banner off noprint" hidden>
+    Spostare questa riunione nel Cestino? Audio, trascrizione e verbale verranno rimossi dall'elenco (recuperabili dal Cestino del Mac).
+    <div class="actions"><button class="btn inline danger" id="btnDeleteYes">Sì, elimina</button>
+    <button class="btn inline" id="btnDeleteNo">Annulla</button></div>
+  </div>
+  <div id="info" class="small muted noprint"></div>
   <div id="audioBox" class="card" hidden><h3>Audio</h3><audio id="player" controls preload="metadata"></audio></div>
   <div id="transcriptBox" class="card" hidden><h3>Trascrizione</h3><pre id="transcript" class="transcript"></pre></div>
   <div id="warnings" class="small muted"></div>

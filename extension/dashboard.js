@@ -1,5 +1,5 @@
-import { getStatus, listMeetings, openDataRoot } from "./lib/api.js";
-import { el, filterMeetings, fmtDate, fmtDuration, fmtTime, statusLabel, STEP_LABELS } from "./lib/ui.js";
+import { getStatus, getStorage, listMeetings, openDataRoot } from "./lib/api.js";
+import { el, filterMeetings, fmtBytes, fmtDate, fmtDuration, fmtTime, statusLabel, STEP_LABELS } from "./lib/ui.js";
 
 const $ = (id) => document.getElementById(id);
 let all = [];
@@ -43,6 +43,11 @@ async function load() {
         : `${st.queue_length} riunioni in coda`;
     }
     render();
+    getStorage().then((sp) => {
+      $("storage").textContent = `Riunioni: ${fmtBytes(sp.meetings_bytes)} · Modelli: ${fmtBytes(sp.models_bytes)} · Spazio libero sul disco: ${fmtBytes(sp.free_bytes)}`
+        + (sp.low_space ? " — ⚠ spazio quasi esaurito: libera spazio o sposta le riunioni vecchie su un disco esterno" : "");
+      $("storage").className = sp.low_space ? "small status off" : "small muted";
+    }).catch(() => {});
     return !!(p || st.queue_length || st.recording);
   } catch (e) {
     $("banner").replaceChildren(el("div", { class: "banner off" }, e.userMessage, " ",

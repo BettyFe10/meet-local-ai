@@ -1,5 +1,5 @@
-import { audioUrl, getAudioToken, getMeeting, getSummary, getTranscript, openFolder, renameMeeting, reprocessMeeting } from "./lib/api.js";
-import { el, fmtDate, fmtDuration, fmtTime, renderMarkdownLite, statusLabel } from "./lib/ui.js";
+import { audioUrl, deleteMeeting, exportMeeting, getAudioToken, getMeeting, getSummary, getTranscript, openFolder, renameMeeting, reprocessMeeting } from "./lib/api.js";
+import { downloadText, el, fmtBytes, fmtDate, fmtDuration, fmtTime, renderMarkdownLite, statusLabel } from "./lib/ui.js";
 
 const SECTIONS = ["TL;DR", "DECISIONI", "ACTION ITEMS", "PROBLEMI / CRITICITÀ", "INFORMAZIONI IMPORTANTI", "DOMANDE APERTE", "PROSSIMI PASSI"];
 const BUSY = ["stopped", "converting", "transcribing", "summarizing"];
@@ -29,6 +29,7 @@ async function load() {
   $("date").textContent = `${fmtDate(m.created_at)} ${fmtTime(m.created_at)}`;
   $("duration").textContent = fmtDuration(m.duration_seconds);
   $("status").textContent = statusLabel(m.status);
+  $("info").textContent = m.performance?.disk_bytes ? `Spazio occupato: ${fmtBytes(m.performance.disk_bytes)}` : "";
   $("warnings").replaceChildren(...(m.warnings || []).map((w) => el("div", {}, `⚠ ${w}`)));
   banner(m.status === "error" && m.error ? (m.error.user_message || "Elaborazione non riuscita.") : "");
 
@@ -117,6 +118,39 @@ async function saveRename() {
 }
 $("renameSave").addEventListener("click", saveRename);
 $("renameInput").addEventListener("keydown", (ev) => { if (ev.key === "Enter") saveRename(); if (ev.key === "Escape") toggleRename(false); });
+
+async function doExport(fmt) {
+  try {
+    const text = await exportMeeting(id, fmt);
+    downloadText(`${id}.${fmt}`, text, fmt === "md" ? "text/markdown" : "text/plain");
+    $("info").textContent = `Esportato. Una copia è anche in MeetLocalAI/Exports/${id}.${fmt}`;
+  } catch (e) {
+    banner(e.userMessage);
+  }
+}
+$("btnExportMd").addEventListener("click", () => doExport("md"));
+$("btnExportTxt").addEventListener("click", () => doExport("txt"));
+$("btnPrint").addEventListener("click", async () => {
+  // per la stampa/PDF mostra anche la trascrizione
+  try { $("transcript").textContent = await getTranscript(id, "txt"); $("transcriptBox").hidden = false; } catch { /* senza trascrizione */ }
+  window.print();
+});
+
+$("btnDelete").addEventListener("click", () => { $("confirmDelete").hidden = false; });
+$("btnDeleteNo").addEventListener("click", () => { $("confirmDelete").hidden = true; });
+$("btnDeleteYes").addEventListener("click", async () => {
+  $("btnDeleteYes").disabled = true;
+  try {
+    $("player").pause();
+    $("player").removeAttribute("src");
+    await deleteMeeting(id);
+    location.href = "dashboard.html";
+  } catch (e) {
+    $("confirmDelete").hidden = true;
+    $("btnDeleteYes").disabled = false;
+    banner(e.userMessage);
+  }
+});
 
 $("btnSummary").addEventListener("click", () => requeue(["summarize"]));
 $("btnReprocess").addEventListener("click", () => requeue());

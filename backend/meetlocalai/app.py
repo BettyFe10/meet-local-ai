@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from . import __version__, health, meetings, messages, processing, recording
+from . import __version__, files, health, meetings, messages, processing, recording
 from . import config as config_mod
 from . import logging_setup
 from .security import SecurityPolicy
@@ -67,6 +67,9 @@ def create_app(cfg: dict | None = None) -> FastAPI:
     processor = processing.Processor(cfg, config_mod.data_dirs(cfg), recorder.lock)
     app.state.processor = processor
     if cfg.get("processing", {}).get("enabled", True):
+        removed = files.cleanup_temp(config_mod.data_dirs(cfg)["temp_dir"])
+        if removed:
+            log.info("Cartelle temporanee rimosse all'avvio: %d", removed)
         pending = processor.recover()
         if pending:
             log.info("Riunioni da elaborare rimesse in coda: %d", len(pending))
@@ -165,6 +168,40 @@ def create_app(cfg: dict | None = None) -> FastAPI:
             return JSONResponse(status_code=404, content={"error_code": "audio_not_ready",
                                                           "user_message": "Audio non ancora disponibile.", "detail_logged": False})
         return FileResponse(f, media_type="audio/wav", filename=f"{md['id']}.wav", content_disposition_type="inline")
+
+    # ---------- file: elimina, esporta, spazio ----------
+    @app.delete("/api/v1/meetings/{meeting_id}")
+    def delete_meeting(meeting_id: str):
+        """Sposta la riunione nel Cestino (recuperabile). Mai cancellazione definitiva."""
+        try:
+            md = meetings.get_meeting(meetings_dir, meeting_id)
+        except meetings.MeetingNotFound:
+            return _not_found()
+        if md.get("status") == "recording" or recorder.active_id == meeting_id:
+            raise recording.RecordingError(409, "still_recording", "La registrazione è ancora attiva.")
+        if processor.busy_with(meeting_id) and md.get("status") in ("converting", "transcribing", "summarizing"):
+            raise recording.RecordingError(409, "processing", "La riunione è in elaborazione: riprova tra poco.")
+        with recorder.lock:
+            where = files.trash(meetings_dir / md["id"], config_mod.data_dirs(cfg)["data_root"] / "Cestino")
+        log.info("Riunione %s eliminata (%s)", md["id"], where)
+        return {"deleted": True, "where": where,
+                "user_message": "Riunione spostata nel Cestino." if where == "trash"
+                else "Riunione spostata nella cartella MeetLocalAI/Cestino."}
+
+    @app.get("/api/v1/meetings/{meeting_id}/export")
+    def get_export(meeting_id: str, format: str = Query("md", pattern="^(md|txt)$")):
+        from fastapi.responses import PlainTextResponse  # noqa: PLC0415
+        try:
+            md = meetings.get_meeting(meetings_dir, meeting_id)
+        except meetings.MeetingNotFound:
+            return _not_found()
+        text, out = files.export(meetings_dir / md["id"], md, format, config_mod.data_dirs(cfg)["exports_dir"])
+        return PlainTextResponse(text, media_type="text/markdown; charset=utf-8" if format == "md" else "text/plain; charset=utf-8",
+                                 headers={"X-Export-Path": out.name})
+
+    @app.get("/api/v1/storage")
+    def get_storage():
+        return files.storage(config_mod.data_dirs(cfg))
 
     # ---------- Finder ----------
     def _open_in_finder(path) -> JSONResponse | dict:

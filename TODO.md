@@ -112,15 +112,27 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [x] Indicatore di elaborazione nel popup
 - [ ] Avanzamento in tempo reale osservato su una registrazione nuova — NON TESTATO dall'utente (solo test automatici)
 
-## FASE 12 — Gestione file (PROSSIMA)
-- [ ] Esporta Markdown / TXT (verbale + trascrizione) in `Exports/` e download; PDF solo se semplice (stampa del browser)
-- [ ] Eliminazione riunione dall'interfaccia? (D-016: oggi solo dal Finder) → decidere con l'utente; eventuale spostamento nel Cestino
-- [ ] Pulizia: riunioni di prova senza audio, file temporanei, `raw/` facoltativo dopo l'elaborazione (`keep_raw_tracks`)
-- [ ] Spazio occupato (totale e per riunione) visibile in dashboard/impostazioni; avviso se il disco è quasi pieno
-- [ ] Procedura di backup documentata (copia della cartella Meetings)
+## FASE 12 — Gestione file ✅
+- [x] Esporta Markdown / TXT in `Exports/` + download; PDF con la stampa del browser
+- [x] Elimina dall'interfaccia → Cestino del Mac (D-044)
+- [x] Pulizia file temporanei all'avvio; `raw/` facoltativo (`keep_raw_tracks`)
+- [x] Spazio occupato in dashboard e pagina riunione
+- [x] Procedura di backup (docs/BACKUP.md)
+- [ ] Stampa / PDF — NON confermata dall'utente
+- [ ] Avviso esplicito "disco quasi pieno" in dashboard (oggi: spazio libero mostrato + blocco registrazione sotto 1 GB)
+- [ ] `keep_raw_tracks=false` provato solo nei test automatici — NON TESTATO sul Mac
 
-## FASE 13–16
-- [ ] Vedi ordine fasi nel brief (Trascrizione completa → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
+## FASE 13 — Test completi (PROSSIMA)
+- [ ] Rivedere la copertura: backend, API, filesystem, metadata, trascrizione, sintesi, errori, messaggistica estensione
+- [ ] Controllo automatico "nessun dato personale nei file tracciati"
+- [ ] `diagnose.sh` (stato componenti, senza contenuti delle riunioni)
+- [ ] Log: verifica rotazione e assenza di testo delle riunioni; metriche di prestazione
+- [ ] (U) Prova reale lunga (≥30 min) e backend offline durante la registrazione
+
+## FASE 14–16
+- [ ] 14 Installer e portabilità (install_mac.sh, uninstall_mac.sh, SETUP-NEW-COMPUTER.md, Mac del collega M2 Pro 16 GB)
+- [ ] 15 UI/UX finale (opzione "qualità massima")
+- [ ] 16 Documentazione
 
 ## Installazioni previste (NON ancora eseguite)
 - [ ] (U) `brew install ffmpeg` — Fase 6/7

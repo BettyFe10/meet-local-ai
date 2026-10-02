@@ -67,6 +67,7 @@ backend/
     summarize.py      sintesi a due passaggi / a blocchi, validazione e normalizzazione
     bench_llm.py      benchmark modelli LLM
     processing.py     coda di elaborazione: conversione → trascrizione → file transcript.*
+    files.py          Cestino, export md/txt, spazio occupato, pulizia Temp e raw/
     logging_setup.py  RotatingFileHandler in <logs_dir>/backend.log
     messages.py       testi fissi per l'utente
   .venv/              (non versionato) creato da installer/setup_backend.sh
@@ -120,8 +121,8 @@ Impostazioni leggere in `chrome.storage.local`; impostazioni di elaborazione nel
 | POST | `/meetings/{id}/reprocess` | rimette in coda; `{"steps":["summarize"]}` = solo sintesi |
 | POST | `/meetings/{id}/open-folder` | apre la cartella nel Finder |
 | POST | `/open-data-root` | apre `~/MeetLocalAI` nel Finder |
-
-Nessun endpoint di cancellazione nella v1 (le riunioni si eliminano dal Finder).
+| DELETE | `/meetings/{id}` | sposta la riunione nel Cestino del Mac (409 se in registrazione/elaborazione) |
+| GET | `/storage` | spazio occupato per cartella e spazio libero |
 
 Errori: `{error_code, user_message, detail_logged:true}`. Messaggi utente fissi: "Backend offline.", "Whisper locale non disponibile.", "Modello locale non disponibile."; dettagli tecnici solo nei log.
 

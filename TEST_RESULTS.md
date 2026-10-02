@@ -157,6 +157,19 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Rinomina titolo | Mac + Chrome | SUPERATO | metadata: "RIUNIONE DI TEST 1", cartella invariata |
 | Avanzamento in tempo reale su una nuova registrazione | Mac + Chrome | NON TESTATA | nessuna nuova registrazione fatta |
 
+## Fase 12 — 2026-10-02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (147 test) | VM Linux | SUPERATO | |
+| Elimina: Cestino di sistema (simulato), ripiego su cartella `Cestino`, 409 se in registrazione/elaborazione, ID non valido | VM | SUPERATO | test_files.py |
+| Export md/txt: contenuto, copia in `Exports/`, riunione senza verbale | VM | SUPERATO | |
+| Spazio occupato, pulizia Temp, rimozione `raw/` | VM | SUPERATO | |
+| Elimina dalla pagina riunione → Cestino del Mac | Mac + Chrome | SUPERATO | utente: "ha spostato nel cestino"; log: 3 × "eliminata (trash)" |
+| Esporta Markdown e TXT | Mac + Chrome | SUPERATO | file presenti in `~/MeetLocalAI/Exports/` |
+| Stampa / PDF | Mac + Chrome | NON TESTATA | nessuna conferma esplicita |
+| `keep_raw_tracks=false` su riunione reale | Mac | NON TESTATA | |
+| Ripristino dal Cestino e ricomparsa in dashboard | Mac | NON TESTATA | |
+
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
 Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.
