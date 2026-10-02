@@ -87,12 +87,24 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] (U) Confermare che dopo il ritorno a "senza VAD" la trascrizione di RIUNIONE-DI-TEST è tornata come prima
 - [ ] Avviso in tempo reale durante la registrazione se la traccia della riunione resta muta (oggi solo a posteriori)
 
-## FASE 9 — LLM locale (PROSSIMA)
-- [ ] Ricerca modelli multilingue/italiano 7–9B con licenza permissiva compatibili con 16 GB
-- [ ] (U) Installare Ollama e scaricare il modello scelto (keep_alive breve)
-- [ ] Benchmark su una trascrizione reale: tempo, RAM, qualità in italiano, rispetto del formato
+## FASE 9 — LLM locale (quasi completa)
+- [x] Ricerca modelli multilingue con licenza permissiva (Apache 2.0) per 16 GB
+- [x] Client Ollama locale, blocco modelli cloud, server su richiesta
+- [x] Benchmark su riunione fittizia con verità nota + riunione reale + testo lungo
+- [x] Scelta: gemma4:e4b per 16 GB (D-037)
+- [ ] (U) Installare il modello definitivo con `installer/setup_llm.sh` e verificare health
+- [ ] Misurare la RAM reale dei processi Ollama (`python -m meetlocalai.llm measure`) — il dato di /api/ps per Gemma non è attendibile
+- [ ] Fascia 8 GB (gemma4:e2b) NON TESTATA; qwen3:4b scartato (non rispetta think:false, output in inglese)
 
-## FASE 10–16
+## FASE 10 — Summary (PROSSIMA)
+- [ ] Passo `summarizing` nella pipeline → `summary.md`, stato `completed`; fallimento LLM non blocca la trascrizione
+- [ ] Prompt v2: includere gli impegni presi in prima persona ("lo comunico io"), formato action item sempre completo
+- [ ] Controllo dell'output (deve iniziare con "## TL;DR", niente ragionamenti/inglese) + un nuovo tentativo se non valido
+- [ ] Riunioni lunghe: sintesi a blocchi + unione se la trascrizione supera il contesto
+- [ ] Endpoint summary + sezioni nella pagina riunione
+- [ ] Opzione "qualità massima" (gemma4:12b) nelle impostazioni, con avviso su RAM/tempi
+
+## FASE 11–16
 - [ ] Vedi ordine fasi nel brief (Trascrizione completa → Trascrizione → LLM → Summary → Dashboard → File → Test → Installer → UI → Documentazione)
 
 ## Installazioni previste (NON ancora eseguite)

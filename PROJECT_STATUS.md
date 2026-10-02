@@ -1,8 +1,18 @@
 # PROJECT_STATUS — Meet Local AI
 
-**Ultimo aggiornamento:** 2026-10-01
-**Fase corrente:** FASE 8 — Trascrizione completa → ✅ COMPLETATA (verificata sul Mac; in attesa solo della conferma visiva dopo il ritorno a "senza VAD")
-**Prossima fase:** FASE 9 — LLM locale (NON ANCORA INIZIATA)
+**Ultimo aggiornamento:** 2026-10-02
+**Fase corrente:** FASE 9 — LLM locale → benchmark ✅ e modello scelto; **manca solo l'installazione definitiva del modello sul Mac (U)**
+**Prossima fase:** FASE 10 — Summary (dopo l'installazione del modello)
+
+## Fase 9 — cosa è stato fatto
+- Requisito aggiunto dall'utente: deve funzionare bene anche sul Mac del collega (**MacBook Pro M2 Pro, 16 GB**) → scelte tarate sulla fascia 16 GB, non sul solo Mac di sviluppo; modello scelto automaticamente in base alla RAM (`llm.model = "auto"`).
+- `llm.py`: client Ollama solo loopback; modelli "cloud" rifiutati; `ollama serve` avviato su richiesta e fermato a fine lavoro; modelli in `~/MeetLocalAI/Models/ollama`; `think: false`; scelta per RAM (≥24 GB `gemma4:12b`, 12–23 GB `gemma4:e4b`, <12 GB `gemma4:e2b` NON TESTATO); comandi `python -m meetlocalai.llm install|which|measure`.
+- `summary_prompt.py` v1 (sezioni fisse, "non inventare", testo standard per i dati mancanti).
+- Riunione **fittizia** con verità nota in `tests/fixtures/` + `bench_llm.py` (3 prove per modello, un modello alla volta su disco).
+- Benchmark sul Mac (Ollama 0.35.0) di qwen3:4b, qwen3:8b, gemma4:e4b, gemma4:12b → vedi TEST_RESULTS. **Scelta per 16 GB: `gemma4:e4b`** (D-037).
+- health: "Modello locale" disponibile = Ollama installato + modello su disco (senza server acceso).
+- `installer/setup_llm.sh` (installazione definitiva, idempotente). Test: 114.
+- Nota: il 2026-10-02 il benchmark è stato rilanciato per errore una seconda volta (riscaricava i modelli): va interrotto con Ctrl+C; `setup_llm.sh` ripulisce i download parziali.
 
 ## Fase 8 — cosa è stato fatto
 - `processing.py`: dopo TERMINA la riunione entra in una coda FIFO (thread dedicato, una alla volta): `converting` → `transcribing` → **`transcribed`** (nuovo stato; `completed` arriverà con la sintesi in Fase 10). Riunioni rimaste a metà vengono rimesse in coda al riavvio. Errori → `error` con passo e messaggio per l'utente.
@@ -128,9 +138,10 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 4. Le mie azioni sul Mac passano da una VM che vede solo `~/MeetLocalAI`: installazioni di sistema (brew, Ollama) e il caricamento dell'estensione in Chrome richiederanno che l'utente esegua comandi/script forniti.
 
 ## Operazioni che richiedono intervento dell'utente
+- Installare il modello dei riassunti: `cd ~/MeetLocalAI/app && bash installer/setup_llm.sh && ./stop_backend.sh; ./start_backend.sh`
 - (Opzionale, quando vuoi) Pubblicare su GitHub privato seguendo `docs/GITHUB.md` (creare repo + `git push`).
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 9.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → verificare che `setup_llm.sh` sia stato eseguito (health: Modello locale ✓), poi iniziare FASE 10.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).

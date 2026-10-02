@@ -35,10 +35,11 @@
   "llm": {
     "provider": "ollama",
     "base_url": "http://127.0.0.1:11434",
-    "model": "",
+    "model": "auto",
     "temperature": 0.2,
     "context_tokens": 8192,
-    "summary_language": "it"
+    "summary_language": "it",
+    "keep_alive": "30s"
   },
   "summary": {
     "enabled": true,

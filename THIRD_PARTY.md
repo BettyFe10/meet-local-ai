@@ -31,6 +31,11 @@ Obblighi generali per licenze MIT/BSD: mantenere l'avviso di copyright e il test
 |---|---|---|---|
 | Whisper large-v3-turbo (OpenAI), formato ggml | ggml-large-v3-turbo.bin (1,5 GB) | huggingface.co/ggerganov/whisper.cpp | MIT (pesi Whisper) |
 
+| Gemma 4 E4B (Google), via Ollama `gemma4:e4b` | ~6 GB | ollama.com/library/gemma4 | Apache 2.0 |
+| Gemma 4 12B (opzionale, ≥24 GB) `gemma4:12b` | ~8 GB | ollama.com/library/gemma4 | Apache 2.0 |
+
+Ollama 0.35.0 (github.com/ollama/ollama, MIT) è installato con Homebrew ed eseguito come programma separato.
+
 ## Opzionali (non installati di default)
 | Componente | Versione provata | Licenza | Nota |
 |---|---|---|---|
@@ -39,5 +44,4 @@ Obblighi generali per licenze MIT/BSD: mantenere l'avviso di copyright e il test
 ## Previsti (non ancora installati)
 | Componente | Fase | Nota licenza da verificare |
 |---|---|---|
-| Ollama | 9 | MIT |
-| Modello LLM | 9 | **dipende dal modello**: preferire licenze permissive (es. Apache-2.0) per l'uso aziendale |
+| — | — | — |

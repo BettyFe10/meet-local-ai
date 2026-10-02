@@ -49,21 +49,14 @@ def create_app(cfg: dict | None = None) -> FastAPI:
     def get_health():
         ff = health.check_ffmpeg()
         wh = health.check_whisper(cfg, config_mod.data_dirs(cfg)["models_dir"])
-        ol = health.check_ollama(cfg["llm"]["base_url"])
-        llm_model = cfg["llm"].get("model") or None
+        lm = health.check_llm(cfg, config_mod.data_dirs(cfg)["models_dir"])
         return {
             "status": "ok",
             "version": __version__,
             "uptime_seconds": round(time.time() - started_at, 1),
             "ffmpeg": {"available": ff["available"], "user_message": None if ff["available"] else messages.FFMPEG_UNAVAILABLE},
             "whisper": {**wh, "user_message": None if wh["available"] else messages.WHISPER_UNAVAILABLE},
-            "llm": {
-                "available": ol["available"] and llm_model is not None,
-                "provider": cfg["llm"]["provider"],
-                "ollama_running": ol["available"],
-                "model": llm_model,
-                "user_message": None if (ol["available"] and llm_model) else messages.LLM_UNAVAILABLE,
-            },
+            "llm": {**lm, "user_message": None if lm["available"] else messages.LLM_UNAVAILABLE},
         }
 
 

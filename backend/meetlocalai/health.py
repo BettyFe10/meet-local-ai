@@ -39,3 +39,13 @@ def check_whisper(cfg: dict, models_dir) -> dict:
     if eng is None:
         return {"available": False, "engine": None, "model": None}
     return {"available": True, "engine": eng.name, "model": eng.model}
+
+
+def check_llm(cfg: dict, models_dir) -> dict:
+    """LLM utilizzabile = Ollama installato + modello presente su disco (il server parte solo quando serve)."""
+    from . import llm  # noqa: PLC0415
+    model = llm.resolve_model(cfg)
+    binary = which("ollama") is not None
+    present = llm.model_on_disk(models_dir, model)
+    return {"available": binary and present and not llm.is_cloud_model(model), "provider": "ollama",
+            "ollama_installed": binary, "model": model, "model_downloaded": present}

@@ -1,0 +1,21 @@
+{
+  "_nota": "Riunione FITTIZIA scritta per i test. Verità nota per valutare la sintesi: cosa DEVE esserci e cosa NON deve comparire.",
+  "decisioni_attese": [
+    "lancio campagna autunnale spostato dal 15 al 22 ottobre",
+    "budget social 4000 euro/mese per ottobre e novembre, poi 3000 da dicembre",
+    "non rinnovare il contratto con l'agenzia alla scadenza (31 dicembre)",
+    "aprire una posizione per un video maker / produzione video interna"
+  ],
+  "non_decisioni": ["profilo TikTok: decisione rimandata a gennaio (NON è una decisione presa di aprirlo)"],
+  "action_items_attesi": [
+    {"attivita": "comunicare lo spostamento del lancio alla direzione", "responsabile": "chi registrava (Microfono locale) — nome non detto", "scadenza": "non determinabile"},
+    {"attivita": "descrizione della posizione video maker", "responsabile": "Giulia", "scadenza": "venerdì prossimo"},
+    {"attivita": "contattare il fornitore per il costo del kit video", "responsabile": "Marco", "scadenza": "non determinabile"},
+    {"attivita": "aggiornare la pagina del sito con le nuove date", "responsabile": "non determinabile", "scadenza": "non determinabile"}
+  ],
+  "domande_aperte": ["disponibilità del fotografo di giugno a metà ottobre"],
+  "problemi": ["agenzia consegna in ritardo (fino a 10 giorni) e contenuti generici", "solo 2 video su 6 consegnati, qualità insufficiente"],
+  "prossimi_passi": ["riunione giovedì prossimo alle 10"],
+  "nomi_ammessi": ["Giulia", "Marco"],
+  "errori_gravi": ["TikTok presentato come deciso", "nomi di persone non presenti nel testo", "scadenze inventate per Marco o per il sito", "responsabile inventato per l'aggiornamento del sito"]
+}

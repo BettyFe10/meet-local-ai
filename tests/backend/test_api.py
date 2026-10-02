@@ -19,7 +19,7 @@ def test_health_reports_missing_components_with_user_messages(client):
     body = client.get("/api/v1/health", headers=HDR).json()
     assert body["whisper"]["available"] is False
     assert body["whisper"]["user_message"] == messages.WHISPER_UNAVAILABLE
-    assert body["llm"]["available"] is False            # Ollama su porta chiusa
+    assert body["llm"]["available"] is False            # modello non scaricato
     assert body["llm"]["user_message"] == messages.LLM_UNAVAILABLE
 
 

@@ -120,7 +120,31 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Qualità con VAD | Mac | PEGGIORE | frasi lontane accorpate, tempi spostati → ordine tra tracce errato; utente: "andava meglio prima" → VAD disattivato |
 | Trascrizione dopo ritorno a senza VAD | — | NON TESTATA | richiede riavvio + rielabora |
 
+## Fase 9 — 2026-10-01/02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (114 test) | VM Linux | SUPERATO | client Ollama con server finto: blocco cloud, think off, modello mancante, scelta per RAM, health |
+| Benchmark 4 modelli (download → 3 prove → rimozione) | Mac M4 16 GB | SUPERATO | tabella sotto; un solo modello alla volta su disco |
+| Nessun modello cloud utilizzabile | VM (test) | SUPERATO | nomi con "cloud" rifiutati prima di ogni chiamata |
+| Installazione definitiva gemma4:e4b + health "Modello locale ✓" | Mac | NON TESTATA | in attesa dell'utente |
+| RAM reale del modello | Mac | NON MISURATA | |
+| Funzionamento su MacBook Pro M2 Pro 16 GB (collega) | — | NON TESTATA | atteso pari o migliore (GPU e banda di memoria superiori) |
+
 ## Benchmark
+### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
+Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.
+
+| Modello (licenza) | A: tempo | A: token/s | C: tempo | Decisioni (4) | Action item (4) | TikTok rimandato trattato bene | Invenzioni |
+|---|---|---|---|---|---|---|---|
+| **gemma4:e4b** (Apache 2.0) | **35 s** | 26 | **69 s** | 4/4 | 3/4 (manca "comunicare alla direzione"); un item senza campo Scadenza | sì (in Domande aperte) | nessuna |
+| gemma4:12b (Apache 2.0) | 81 s | 11 | 171 s | 4/4 | **4/4** (attribuisce correttamente a "Microfono locale") | sì | nessuna |
+| qwen3:8b (Apache 2.0) | 52 s | 18 | 147 s | 4 in 3 punti | 3/4 + 1 attività non assegnata nella riunione (fotografo) | omesso | lieve ("i fornitori") |
+| qwen3:4b (Apache 2.0) | 197 s | 27 | 279 s | — | — | — | SCARTATO: ignora `think:false`, 5.000 token di ragionamento in inglese |
+
+Prova B (chiamata reale di 69 s, trascrizione imperfetta): gemma4:e4b non inventa decisioni né attività ("Non chiaramente determinabile…"); gemma4:12b crea un action item interpretando male una frase.
+Memoria: il valore di `/api/ps` per i modelli Gemma (≈0,3–1 GB) NON è attendibile → RAM reale NON MISURATA (da fare con `llm measure`); qwen3:8b ≈ 5,9–7,1 GB.
+Valutazione umana (Claude) dei verbali confrontati con `tests/fixtures/riunione_fittizia_marketing.expected.json`.
+
 ### Whisper — 2026-10-01, Mac mini M4 16 GB, riunione di test 68,6 s (tracce: scheda + microfono), modello large-v3-turbo
 | Motore | Traccia | Tempo | Rapporto realtime | RAM max* | Segmenti / caratteri |
 |---|---|---|---|---|---|

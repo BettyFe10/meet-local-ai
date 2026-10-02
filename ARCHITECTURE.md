@@ -62,6 +62,9 @@ backend/
     audio.py          FFmpeg: webm→WAV 16 kHz mono, mix tracce
     transcribe.py     motori Whisper (whisper.cpp predefinito; mlx opzionale), senza rete
     bench.py          benchmark motori (tempo, RTF, RAM; --repeat, --no-vad)
+    llm.py            client Ollama locale (loopback, no cloud, server su richiesta, scelta modello per RAM)
+    summary_prompt.py prompt del verbale
+    bench_llm.py      benchmark modelli LLM
     processing.py     coda di elaborazione: conversione → trascrizione → file transcript.*
     logging_setup.py  RotatingFileHandler in <logs_dir>/backend.log
     messages.py       testi fissi per l'utente
