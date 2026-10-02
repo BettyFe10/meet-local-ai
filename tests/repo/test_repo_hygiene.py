@@ -108,3 +108,19 @@ def test_install_ram_tiers_match_backend():
     for gb, model in ((32, llm.recommended_model(32)), (16, llm.recommended_model(16)), (8, llm.recommended_model(8))):
         assert model in sh, (gb, model)
     assert sorted(t[0] for t in llm.RAM_TIERS if t[0] > 0) == [12, 24]
+
+
+def test_documentation_is_complete_and_links_resolve():
+    docs = ["README.md", "SETUP-NEW-COMPUTER.md", "docs/GUIDA-UTENTE.md", "docs/PRIVACY.md", "docs/LIMITI-NOTI.md",
+            "docs/BACKUP.md", "docs/GITHUB.md", "installer/README.md"]
+    for d in docs:
+        p = REPO / d
+        assert p.is_file(), d
+        for m in re.finditer(r"\]\(([^)#]+?\.(?:md|json|sh))\)", p.read_text(encoding="utf-8")):
+            target = (p.parent / m.group(1)).resolve()
+            assert target.is_file(), f"{d}: collegamento rotto → {m.group(1)}"
+    guide = (REPO / "docs/GUIDA-UTENTE.md").read_text(encoding="utf-8")
+    for msg in ("Backend offline.", "Whisper locale non disponibile.", "Modello locale non disponibile."):
+        assert msg in guide
+    limits = (REPO / "docs/LIMITI-NOTI.md").read_text(encoding="utf-8")
+    assert "NON TESTATO" in limits

@@ -206,6 +206,13 @@ Regola: ogni voce è **SUPERATO**, **FALLITO** o **NON TESTATA**. Nulla è dichi
 | Passaggio a "Qualità massima" e sintesi con gemma4:12b | Mac | NON TESTATA | modello non scaricato |
 | Avviso scheda muta in registrazione reale | Mac + Chrome | NON TESTATA | |
 
+## Fase 16 — 2026-10-02
+| Test | Ambiente | Esito | Note |
+|---|---|---|---|
+| Suite completa (169 test) | VM Linux | SUPERATO | sul Mac NON rieseguita (ultima: 164, Fase 14) |
+| Documenti presenti, collegamenti interni validi, messaggi fissi nella guida | VM | SUPERATO | |
+| Guida seguita da una persona che non conosce il progetto | — | NON TESTATA | avverrà con il collega |
+
 ## Benchmark
 ### LLM per la sintesi — 2026-10-01, Mac mini M4 16 GB, Ollama 0.35.0, prompt v1
 Prove: A) riunione fittizia (657 parole, ~1900 token) con verità nota; C) testo lungo ~12.000 token (≈50 min di riunione), contesto 16k.

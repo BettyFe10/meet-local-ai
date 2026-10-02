@@ -1,8 +1,21 @@
 # PROJECT_STATUS — Meet Local AI
 
 **Ultimo aggiornamento:** 2026-10-02
-**Fase corrente:** FASE 15 — UI/UX finale → ✅ COMPLETATA (sezione Sintesi vista in Chrome; cambio modello e avviso scheda muta NON TESTATI dal vivo)
-**Prossima fase:** FASE 16 — Documentazione (NON ANCORA INIZIATA) — ultima fase
+**Fase corrente:** FASE 16 — Documentazione → ✅ COMPLETATA
+**Prossima fase:** nessuna: le 16 fasi del piano sono concluse. Restano le prove dal vivo e la pubblicazione (vedi "Cosa resta").
+
+## Cosa resta (dopo le 16 fasi)
+1. (U) Pubblicare su GitHub privato (`docs/GITHUB.md`) e far installare al collega con `SETUP-NEW-COMPUTER.md` → prima prova su un secondo Mac.
+2. (U) Prove dal vivo ancora NON TESTATE: riunione ≥30 min, backend offline durante la registrazione, avvio dopo riavvio, Stampa/PDF, "Qualità massima", avviso scheda muta. Elenco in `docs/LIMITI-NOTI.md`.
+3. (U) Backup di `~/MeetLocalAI/Config/extension-signing-key.pem`.
+4. Rieseguire la suite sul Mac (ultima esecuzione sul Mac: 164 test, Fase 14; ora sono 169).
+5. Miglioramenti facoltativi in TODO.md (ID anonimo nei log, lock delle dipendenze, qualità del verbale).
+
+## Fase 16 — cosa è stato fatto
+- README finale (cosa fa, requisiti, installazione, indice della documentazione, comandi).
+- `docs/GUIDA-UTENTE.md` (uso, stati, pulsanti, verbale, impostazioni, avvisi), `docs/PRIVACY.md` (dove stanno i dati, rete, protezioni del backend, permessi dell'estensione, consenso dei partecipanti, eliminazione), `docs/LIMITI-NOTI.md` (cosa non fa, qualità, elenco del NON TESTATO), `installer/README.md`.
+- Test: 169 (documenti presenti, collegamenti interni validi, messaggi fissi citati nella guida).
+- THIRD_PARTY.md non riverificato in questa fase (ultima verifica licenze: 2026-09-29 + modelli Gemma in Fase 9): da ricontrollare prima di distribuire fuori dall'azienda.
 
 ## Fase 15 — cosa è stato fatto
 - Impostazioni → **Sintesi**: scelta del modello ("Automatico (consigliato per questo Mac)" / "Qualità massima" gemma4:12b con avviso su tempi e memoria sotto i 24 GB). Mostra se il modello è presente; se manca, il comando per scaricarlo. Salvata nel config locale (solo `llm.model`), vale dalla prossima sintesi.
@@ -198,5 +211,5 @@ Nessun comando: il backend è già attivo e partirà a ogni login. Comandi utili
 - Estensione già caricata in Chrome (modalità sviluppatore). Dopo modifiche al codice: `chrome://extensions` → icona ricarica sull'estensione.
 
 ## Punto esatto da cui riprendere
-Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → iniziare FASE 16.
+Dire: **"Riprendi il progetto Meet Local AI"** → leggere questo file e TODO.md → nessuna fase in sospeso: seguire "Cosa resta" in cima a questo file.
 - Nota: le operazioni git dalla VM di Claude richiedono il permesso di cancellazione su ~/MeetLocalAI (file temporanei/lock di git).

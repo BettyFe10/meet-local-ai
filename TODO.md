@@ -147,8 +147,14 @@ Legenda: [x] fatto · [ ] da fare · (U) richiede azione dell'utente
 - [ ] (U) Cambio modello dal vivo e sintesi con gemma4:12b — NON TESTATO
 - [ ] (U) Avviso scheda muta in una registrazione reale — NON TESTATO
 
-## FASE 16 — Documentazione (PROSSIMA)
-- [ ] README finale, guida utente, limiti noti, privacy
+## FASE 16 — Documentazione ✅
+- [x] README finale, guida utente, privacy, limiti noti, installer/README
+- [ ] Riverificare THIRD_PARTY.md (versioni e licenze) prima di una distribuzione esterna
+
+## Dopo il piano (vedi PROJECT_STATUS → "Cosa resta")
+- [ ] (U) Push su GitHub privato e installazione del collega
+- [ ] (U) Prove dal vivo NON TESTATE (docs/LIMITI-NOTI.md)
+- [ ] (U) Rieseguire la suite sul Mac (169 test)
 
 ## Installazioni previste (NON ancora eseguite)
 - [ ] (U) `brew install ffmpeg` — Fase 6/7
